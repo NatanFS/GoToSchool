@@ -23,17 +23,19 @@
                                 Login</small>   
                         </h6>
                     </div>
-                    {% if message %}
-                    <div class="alert-warning mt-1 mb-1 ps-2">{{ message }}</div>
-                    {% endif %}
+                    
                     <form action="{% url 'login' %}" method="POST" >
                         {% csrf_token %}
                         <input class="form-control mt-3 mb-2" type="text" placeholder="Usuário" name="username">
                         <input class="form-control mb-2" type="password" placeholder="Senha" name="password">
+                        {% if message %}
+                           <div class="alert-warning mt-1 mb-2 ps-2">{{ message }}</div>
+                        {% endif %}
                         <div class="d-grid gap-2 ">
                             <input class="btn btn-primary " type="submit" value="Login">
                         </div>
                     </form>
+                    
                     <div class="text-end me-3 mt-1">
                         <a href="">Esqueceu a senha?</a>
                     </div>

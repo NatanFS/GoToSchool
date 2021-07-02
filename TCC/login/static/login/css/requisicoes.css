@@ -16,3 +16,61 @@ body{
     font-family: sans-serif;
 }
 
+tr{
+    overflow: hidden;
+    height: 0px!important;
+    height: 0.01px!important; max-height:0.01px!important;
+}
+
+@keyframes hide-btn{
+    0%{
+        height: 30px;
+        width: 30px;
+        opacity: 1;
+        display: block;
+    }
+
+    100%{
+        opacity: 0;
+        display: none;
+        height: 0px;
+        width: 0px;
+        padding: 0px;
+        margin: 0px;
+    }
+}
+
+@keyframes hide{
+    0%{
+        opacity: 1;
+        height: 100%;
+        line-height: 100%;
+        
+    }
+
+    75%{
+        opacity: 0;
+        height: 0;
+        line-height: 0px;
+        margin:0;
+        padding-bottom:0;
+        padding-top:0;
+    }
+
+    100%{
+        opacity: 0;
+        height: 0;
+        line-height: 0px;
+        padding-bottom:0;
+        padding-top:0;
+        margin:0;
+        padding:0;
+    }
+}
+
+
+
+.fas{
+    color: #ffffff;
+
+}

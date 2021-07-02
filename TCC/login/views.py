@@ -2,6 +2,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 # Create your views here.
 def login_view(request):
@@ -19,7 +20,8 @@ def login_view(request):
             })
     else:
         return render(request, 'login/login.html')
-    
+
+
 def index(request):
     user = request.user
     if user.is_anonymous:
@@ -31,6 +33,7 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("login"))
 
+@login_required
 def requisicoes_view(request):
     return render(request, "login/requisicoes.html")
 

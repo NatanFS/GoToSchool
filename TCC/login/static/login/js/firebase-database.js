@@ -1,3 +1,6 @@
+ReactDOM.render(<TableCarregando/>,
+    document.querySelector('main'))
+
 firebase.auth().onAuthStateChanged(function(user) {
     if(user){
         var arrayRequisicoes = []
@@ -14,17 +17,21 @@ firebase.auth().onAuthStateChanged(function(user) {
                         }
                     })
                 })
+                //Recuperar Usuários de cada requisicao
                 arrayRequisicoes.forEach(req => {
                     dbRef.child("dados/usuarios/" + req.usuarioID).get().then(snapshot => {
                         usuario = snapshot.val()
                         console.log(usuario.nome)
                         var reqUsuario = new RequisicaoUsuario(req, usuario)
                         requisicoesUsuarios.push(reqUsuario)
-                        ReactDOM.render(<Table requisicoes={requisicoesUsuarios}/>,
-                            document.querySelector('main'))
+                        if(requisicoesUsuarios.length === arrayRequisicoes.length){
+                            ReactDOM.render(<RequisicoesPage requisicoesUsuarios={requisicoesUsuarios}/>,
+                                document.querySelector('main'))
+                        }
                     })
                 })
 
+                
                 
             } else {
                 console.log('Sem dados disponívies')
@@ -32,6 +39,8 @@ firebase.auth().onAuthStateChanged(function(user) {
         }).catch((error) => {
             console.error(error)
         })
+
+        
     } else {
         firebase.auth().signInAnonymously().catch(function(error) {
             var errorCode = error.code;
