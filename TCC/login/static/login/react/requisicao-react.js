@@ -1,33 +1,12 @@
 function RequisicoesPage(props) {
-    var rows = new Array();
-    var pages = new Array();
-    var dados = props.requisicoesUsuarios;
-    var nRequisicoes = dados.length
-    var nPaginas = Math.ceil(nRequisicoes / 10)
-    dados.forEach((req, index) => {
-        var row = (<LinhaReq requisicao={req.requisicao} usuario={req.usuario}
-            index={index+1} />)
-        rows.push(row)
-    })
-
-    for (let i = 0; i < nPaginas; i++) {
-        var rowsPage = [];
-        for (let j = i * 10; j < i * 10 + 10; j++) {
-            if (rows.length > j) {
-                rowsPage.push(rows[j])
-            }
-        }
-        pages[i] = rowsPage
-    }
-
-    console.log(pages[1])
     return (<div>
-        <Table pages={pages} total={rows.length}></Table>
+        <Table props={props}></Table>
     </div>)
 }
 
 function TableData(props) {
     var rows = props.rows
+    console.log(rows)
     return (
         <table class="table table-dark table-striped">
             <thead>
@@ -48,7 +27,6 @@ function TableData(props) {
 
 function LinhaReq(props) {
 
-    const [state, setState] = React.useState(props)
     var dbRef = firebase.database().ref();
     const rowAnimation = {
         "animation-name": "hide",
@@ -72,42 +50,18 @@ function LinhaReq(props) {
     }
 
     function deny() {
-        let row = document.getElementById(state.index);
-        var button = row.getElementsByClassName("button")
-        button[0].style.animationPlayState = "running"
-        button[1].style.animationPlayState = "running"
-
-        for (let i = 0; i < row.childNodes.length; i++) {
-            row.childNodes[i].style.animationPlayState = "running"
-        }
-
-        row.childNodes[0].addEventListener('animationend', () => {
-            row.remove()
-        })
-
-        dbRef.child('dados/requisicoes/' + state.usuario.idUsuario + "/" + state.requisicao.requisicaoID + "/statusRequisicao").set(-1)
-
+        dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(-1)
+        props.update(props.index)
     }
 
     function confirm() {
-        let row = document.getElementById(state.index);
-        var button = row.getElementsByClassName("button")
-        button[0].style.animationPlayState = "running"
-        button[1].style.animationPlayState = "running"
-
-        for (let i = 0; i < row.childNodes.length; i++) {
-            row.childNodes[i].style.animationPlayState = "running"
-        }
-
-        row.childNodes[0].addEventListener('animationend', () => {
-            row.remove()
-        })
-        dbRef.child('dados/requisicoes/' + state.usuario.idUsuario + "/" + state.requisicao.requisicaoID + "/statusRequisicao").set(1)
+        dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(1)
+        props.update(props.index)
     }
 
     return (
         <tr className="requisicao" id={props.index} style={rowAnimation}>
-            <th className="align-items-center" scope="row" style={style}>{props.index}</th>
+            <th className="align-items-center" scope="row" style={style}>{props.index + 1}</th>
             <td className="align-items-center" style={style}>{props.usuario.nome}</td>
             <td className="align-items-center" style={style}>{props.requisicao.dataViagem}</td>
             <td className="align-items-center" style={style}>{props.requisicao.dataHoraRequisicao}</td>
@@ -118,6 +72,149 @@ function LinhaReq(props) {
         </tr>
     )
 }
+
+function Table(props) {
+
+
+    var rows = new Array();
+    var pages = new Array();
+    var dados = props.props.requisicoesUsuarios;
+    var mensagem;
+    dados.forEach((req, index) => {
+        var row = (<LinhaReq requisicao={req.requisicao} usuario={req.usuario}
+            index={index} update={update} />)
+        rows.push(row)
+    })
+
+    const [state, setState] = React.useState({
+        pageIndex: 0,
+        inicio: inicio,
+        rows: rows,
+        fim: fim,
+    })
+
+    if(state.rows.length !== 0){
+        var nRequisicoes = state.rows.length
+        var nPaginas = Math.ceil(nRequisicoes / 10)
+    
+        for (let i = 0; i < nPaginas; i++) {
+            var rowsPage = [];
+            for (let j = i * 10; j < i * 10 + 10; j++) {
+                if (state.rows.length > j) {
+                    rowsPage.push(state.rows[j])
+                }
+            }
+            pages[i] = rowsPage
+        }
+    
+    
+        var pageSelecionada;
+        var btnLeftStyle = {}
+        var btnRightStyle = {}
+        var pageIndex = state.pageIndex;
+        console.log("Page index: " + state.pageIndex)
+        if (!pages[pageIndex]) {
+            pageIndex--;
+            setState((state) => {
+                return {
+                    ...state,
+                    pageIndex: pageIndex
+                }
+            })
+        }
+        var inicio = pageIndex * 10 + 1
+        var fim;
+        if (pages[pageIndex + 1]) {
+            fim = pageIndex * 10 + 10
+        } else {
+            fim = pageIndex * 10 + pages[pageIndex].length
+        }
+    
+        
+        pageSelecionada = pages[pageIndex]
+        console.log(pages)
+        mensagem = `Exibindo ${inicio}-${fim} de ${state.rows.length} requisicões.`
+        definirVisibilidadeBtn()
+    } else {
+        mensagem = `Não há requisições a serem respondidas.`
+        definirVisibilidadeBtn()
+    }
+    
+
+    function update(index) {
+        var updatedRows = []
+        console.log(updatedRows)
+        setState(function (prevState) {
+            var rows = prevState.rows
+            console.log("pageIndex: " + prevState.pageIndex)
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].props.index !== index) {
+                    updatedRows.push(rows[i])
+                } else {
+                    console.log(rows[i])
+                }
+            }
+            console.log(updatedRows)
+            return {
+                ...prevState,
+                rows: updatedRows
+            }
+        })
+    }
+
+
+    function nextRows() {
+        if (pageIndex < pages.length) {
+            setState((state) => {
+                pageIndex = state.pageIndex + 1;
+                return {
+                    ...state,
+                    pageIndex: pageIndex,
+                }
+            })
+        }
+    }
+
+    function previousRows() {
+        if (pageIndex > 0) {
+            etState((state) => {
+                pageIndex = state.pageIndex - 1;
+                return {
+                    ...state,
+                    pageIndex: pageIndex,
+                }
+            })
+        }
+    }
+
+
+    function definirVisibilidadeBtn() {
+        if (!pages[pageIndex - 1]) {
+            btnLeftStyle = {
+                "display": "none"
+            }
+        }
+
+        if (!pages[pageIndex + 1]) {
+            btnRightStyle = {
+                "display": "none"
+            }
+        }
+    }
+
+    return (<div className="text-center">
+        <TableData rows={pageSelecionada}>
+        </TableData>
+        <button className="btn" onClick={previousRows} style={btnLeftStyle}>
+            <span className="fas fa-arrow-left" ></span>
+        </button>
+        {mensagem}
+        <button className="btn" onClick={nextRows} style={btnRightStyle}>
+            <span className="fas fa-arrow-right" ></span>
+        </button>
+    </div>)
+}
+
 
 function TableCarregando() {
     var rows = []
@@ -159,76 +256,3 @@ function LinhaCarregando() {
         </tr>
     )
 }
-
-function Table(props) {
-    console.log("table chamada")
-    var pages = props.pages
-    var pageSelecionada;
-    var btnLeftStyle = {}
-    var btnRightStyle = {}
-
-    const [state, setState] = React.useState({
-        pageIndex: 0,
-        inicio: inicio,
-        fim: fim,
-    })
-
-    var pageIndex = state.pageIndex;
-    var inicio = pages[pageIndex][0].props.index;
-    var fim = pages[pageIndex][pages[pageIndex].length-1].props.index;
-    pageIndex = state.pageIndex;
-    pageSelecionada = pages[pageIndex]
-    definirVisibilidadeBtn()
-
-
-
-    function nextRows() {
-        if (pageIndex < pages.length) {
-            pageIndex = state.pageIndex + 1;
-
-            setState({
-                ...state,
-                pageIndex: pageIndex,
-            })
-        }
-    }
-
-    function previousRows() {
-        if (pageIndex > 0) {
-            pageIndex = state.pageIndex - 1;
-
-            setState({
-                ...state,
-                pageIndex: pageIndex,
-            })
-        }
-    }
-
-
-    function definirVisibilidadeBtn() {
-        if (!pages[pageIndex - 1]) {
-            btnLeftStyle = {
-                "display": "none"
-            }
-        }
-
-        if(!pages[pageIndex + 1]){
-            btnRightStyle = {
-                "display": "none"
-            }
-        }
-    }
-
-    return (<div className="text-center">
-        <TableData rows={pageSelecionada}>
-        </TableData>
-        <button className="btn" onClick={previousRows} style={btnLeftStyle}>
-            <span className="fas fa-arrow-left" ></span>
-        </button>
-        Exibindo {inicio}-{fim} de {props.total} requisicões.
-        <button className="btn" onClick={nextRows} style={btnRightStyle}>
-            <span className="fas fa-arrow-right" ></span>
-        </button>
-    </div>)
-}
-

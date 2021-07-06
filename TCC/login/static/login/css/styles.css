@@ -1,8 +1,22 @@
 body, html{
     height: 100%;
-    background-color: #2a2e33;
+    background-color: #2a2e33!important;
     color: white;
     font-family: sans-serif;
 }
 
+footer{
+    color: rgb(144, 144, 144)!important;
+}
 
+nav{
+    margin-bottom: 10px;
+}
+
+.body-content{
+    border-radius: 20px;
+    background-color: #4c535c;
+    min-height: 100% - 56px;
+    margin-top: 10px;
+    padding: 10px;
+}
