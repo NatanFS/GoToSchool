@@ -1,4 +1,3 @@
-
 import pyrebase
 def initialize_firebase():
     credentials_google = {
@@ -22,7 +21,11 @@ def initialize_firebase():
         "storageBucket": "projetointegrador-7141d.appspot.com",
         "messagingSenderId": "173544521842",
         "appId": "1:173544521842:web:1f85ddf0d5dd23334182eb",
-        "serviceAccout": credentials_google
+        "serviceAccount": credentials_google
     }
     firebase = pyrebase.initialize_app(config)
     return firebase
+
+def filtrar_req_pendentes(req):
+    if(req["statusRequisicão"] == 0):
+        return req

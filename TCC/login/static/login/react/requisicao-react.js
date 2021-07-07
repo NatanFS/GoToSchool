@@ -50,12 +50,12 @@ function LinhaReq(props) {
     }
 
     function deny() {
-        dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(-1)
+        //dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(-1)
         props.update(props.index)
     }
 
     function confirm() {
-        dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(1)
+        //dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(1)
         props.update(props.index)
     }
 
