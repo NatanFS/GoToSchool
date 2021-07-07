@@ -51,12 +51,12 @@ def getReqData(request, index):
     busReqs = []
     contador = 0
     inicio = index*10
-    fim = inicio + 10
+    fim = inicio + 20
     for user in dbRequisicoes.each():
         if(contador < fim):
                 #Recuperar usuários
                 data = db.child("dados").child("usuarios").child(user.key()).get().val()
-                userData = {"userData": data}
+                userData = {"user": data}
                 userReqs = []
                 
                 print(userData)
@@ -82,7 +82,7 @@ def getReqData(request, index):
             
     print("nReq" + str(len(userReqs)))
     data = {
-        "usersData": usersData,
+        "data": usersData,
         "onibusLista": busReqs
     }
     print(type(data))
