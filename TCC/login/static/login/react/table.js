@@ -1,5 +1,5 @@
 function Table(props) {
-    var dados = props.data.data
+    var dados = props.data
     var onibusLista = props.data.onibusLista
     console.log(dados)
     var rows = []
@@ -100,18 +100,11 @@ function getUserFromReq(req){
 }
 function recuperarUsuarios(){
     console.log(dados)
-    dados.forEach(element => {
-        let user = element.user
-        console.log(element)
-        usuarios.push(user)
-    });
+    usuarios = dados.usuarios
 }
 
 function recuperarRequisicoes(){
-    dados.forEach(element => {
-        let reqs = element.requisicoes
-        requisicoes.splice(-1, 0, ...reqs)
-    });
+    requisicoes = dados.requisicoes
 }
 
 function update(index) {
@@ -188,13 +181,31 @@ function LinhaReq(props) {
     }
 
     function deny() {
+        answerReq(-1)
         //dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(-1)
         props.update(props.index)
     }
 
     function confirm() {
+        answerReq(1)
         //dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(1)
         props.update(props.index)
+    }
+
+    function answerReq(status){
+        fetch('requisicoes/answer', {
+            method: 'POST',
+            body: JSON.stringify(
+              {
+                reqId: props.requisicao.requisicaoID,
+                userId:  props.usuario.idUsuario,
+                status: status,
+              }
+            )
+          }).then(response => response.json())
+            .then(result => {
+              console.log(result)
+            })
     }
 
     return (

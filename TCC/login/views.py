@@ -1,14 +1,15 @@
 from django.http.response import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
-from pyrebase.pyrebase import initialize_app
-from .util import initialize_firebase
+from .util import initialize_firebase, recuperarOnibus
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.csrf import csrf_exempt
 import json
 
 
 firebase = initialize_firebase()
+
 # Create your views here.
 def login_view(request):
     if request.method == "POST":
@@ -43,48 +44,49 @@ def requisicoes_view(request):
     return render(request, "login/requisicoes.html")
 
 def getReqData(request, index):
+    #Index indicará a página selecionada
     db = firebase.database()
-    dbRequisicoes = db.child("dados").child("requisicoes").get()
-    #Dados dos usuários = dados pessoais e requisições
-    #Dados finais = dados dos usuários + os ônibus requisitados
-    usersData = []
-    busReqs = []
-    contador = 0
-    inicio = index*10
-    fim = inicio + 20
-    for user in dbRequisicoes.each():
-        if(contador < fim):
-                #Recuperar usuários
-                data = db.child("dados").child("usuarios").child(user.key()).get().val()
-                userData = {"user": data}
-                userReqs = []
-                
-                print(userData)
-                for key in user.val():
-                    if(contador < fim):
-                        if(contador >= inicio):
-                            contador += 1
-                            #Recuperar requisicoes do usuário
-                            req = user.val()[key]
-                            userReqs.append(req)
-                            print(req["dataViagem"])
-                            #Recuperar dados do ônibus da requisição
-                            bus = db.child("dados").child("dias").child(req["dataViagem"]) \
-                            .child("turnos").child(req["turnoViagem"]) \
-                            .child("onibusLista").child(req["onibusNome"]).get().val()
-                            if(not bus in busReqs):
-                                busReqs.append(bus)
-                        else:
-                            contador += 1
-                    print(contador)
-                userData["requisicoes"] = userReqs
-                usersData.append(userData)
-            
-    print("nReq" + str(len(userReqs)))
+    dbRequisicoes = db.child("dados").child("requisicoes").get().val()
+    
+    # Falha ao tentar filtrar dados do firebase. 
+    # dbRequisicoes = db.child("dados").child("requisicoes")\
+    # .order_by_child("usuarioID").equal_to("bmF0YW5AaG90bWFpbC5jb20=").get().val()
+    # Retorna permissão negada, embora o usuário esteja autenticado. No aplicativo, o mesmo código em java funciona perfeitamente. 
+    usuarios = []
+    onibus = []
+    usuariosIDs = []
+    requisicoes = []
+    
+    for key in dbRequisicoes:
+        req = dbRequisicoes[key]
+        requisicoes.append(req)
+        usuarioID = req["usuarioID"]
+        if(not usuarioID in usuariosIDs):
+            usuariosIDs.append(usuarioID)
+        bus = recuperarOnibus(req, db)
+        if(not bus in onibus):
+            onibus.append(bus)
+    for id in usuariosIDs:
+        usuarioDados = db.child("dados").child("usuarios").child(id).get().val()
+        usuarios.append(usuarioDados)
+        
     data = {
-        "data": usersData,
-        "onibusLista": busReqs
+        "usuarios": usuarios,
+        "requisicoes": requisicoes,
+        "onibusLista": onibus
     }
-    print(type(data))
+    print(data)
     dataJSON = json.dumps(data)
     return JsonResponse(dataJSON, safe=False)
+
+@csrf_exempt
+def answerReq(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+    data = json.loads(request.body)
+    reqId = data.get("reqId", "")
+    userId = data.get("userId", "")
+    status = data.get("status", "")
+    db = firebase.database()
+    db.child(f"dados/requisicoes/{userId}/{reqId}/statusRequisicao").set(status)
+    return JsonResponse({"message": "Request aswered successfully."}, status=201)

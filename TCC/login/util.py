@@ -1,4 +1,10 @@
 import pyrebase
+
+# Temporarily replace quote function
+def noquote(s):
+    return s
+pyrebase.pyrebase.quote = noquote
+
 def initialize_firebase():
     credentials_google = {
     "type": "service_account",
@@ -29,3 +35,9 @@ def initialize_firebase():
 def filtrar_req_pendentes(req):
     if(req["statusRequisicão"] == 0):
         return req
+    
+def recuperarOnibus(req, db):
+    bus = db.child("dados").child("dias").child(req["dataViagem"]) \
+        .child("turnos").child(req["turnoViagem"]) \
+        .child("onibusLista").child(req["onibusNome"]).get().val()
+    return bus
