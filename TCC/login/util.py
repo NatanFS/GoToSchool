@@ -1,10 +1,5 @@
 import pyrebase
 
-# Temporarily replace quote function
-def noquote(s):
-    return s
-pyrebase.pyrebase.quote = noquote
-
 def initialize_firebase():
     credentials_google = {
     "type": "service_account",

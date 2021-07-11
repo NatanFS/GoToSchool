@@ -9,6 +9,7 @@ import json
 
 
 firebase = initialize_firebase()
+db = firebase.database()
 
 # Create your views here.
 def login_view(request):
@@ -43,19 +44,26 @@ def logout_view(request):
 def requisicoes_view(request):
     return render(request, "login/requisicoes.html")
 
+@csrf_exempt
 def getReqData(request, index):
     #Index indicará a página selecionada
-    db = firebase.database()
-    dbRequisicoes = db.child("dados").child("requisicoes").get().val()
     
-    # Falha ao tentar filtrar dados do firebase. 
-    # dbRequisicoes = db.child("dados").child("requisicoes")\
-    # .order_by_child("usuarioID").equal_to("bmF0YW5AaG90bWFpbC5jb20=").get().val()
-    # Retorna permissão negada, embora o usuário esteja autenticado. No aplicativo, o mesmo código em java funciona perfeitamente. 
     usuarios = []
     onibus = []
     usuariosIDs = []
     requisicoes = []
+    totalReqs = db.child("dados/requisicoes/dados/numPendentes").get().val()
+    # Falha ao tentar filtrar dados do firebase.
+    if(request.method == "GET"): 
+        dbRequisicoes = db.child("dados/requisicoes/lista")\
+        .order_by_child("timeinmillis").limit_to_last(10).get().val()
+    else: 
+        data = json.loads(request.body)
+        lastkey = data.get("lastkey", "")
+        dbRequisicoes = db.child("dados/requisicoes/lista")\
+        .order_by_child("timeinmillis").start_at(lastkey).limit_to_last(10).get().val()
+        
+    # Retorna permissão negada, embora o usuário esteja autenticado. No aplicativo, o mesmo código em java funciona perfeitamente. 
     
     for key in dbRequisicoes:
         req = dbRequisicoes[key]
@@ -73,7 +81,9 @@ def getReqData(request, index):
     data = {
         "usuarios": usuarios,
         "requisicoes": requisicoes,
-        "onibusLista": onibus
+        "onibusLista": onibus,
+        "lastkey": requisicoes[-1]["timeinmillis"],
+        "totalReqs": totalReqs
     }
     print(data)
     dataJSON = json.dumps(data)
@@ -87,6 +97,16 @@ def answerReq(request):
     reqId = data.get("reqId", "")
     userId = data.get("userId", "")
     status = data.get("status", "")
-    db = firebase.database()
-    db.child(f"dados/requisicoes/{userId}/{reqId}/statusRequisicao").set(status)
+    db.child(f"dados/requisicoes/lista/{reqId}/statusRequisicao").set(status)
+    
+    if(status == 1):
+        numConfirmadas = db.child("dados/requisicoes/dados/numConfirmadas").get().val()
+        db.child("dados/requisicoes/dados/numConfirmadas").set(numConfirmadas + 1)
+    else:
+        numNegadas = db.child("dados/requisicoes/dados/numNegadas").get().val()
+        db.child("dados/requisicoes/dados/numNegadas").set(numNegadas + 1)
+        
+    numPendentes = db.child("dados/requisicoes/dados/numPendentes").get().val()
+    db.child("dados/requisicoes/dados/numPendentes").set(numPendentes - 1)
+
     return JsonResponse({"message": "Request aswered successfully."}, status=201)

@@ -10,16 +10,21 @@ function Table(props) {
     var btnLeftStyle = {}
     var btnRightStyle = {}
     var pageSelecionada;
+    var totalReqs = props.data.totalReqs
     recuperarUsuarios()
     recuperarRequisicoes()
     console.log(usuarios)
     console.log(requisicoes)
     console.log(onibusLista)
+    const [requisicoesState, setRequisicoes] = React.useState(requisicoes)
     const [pageIndex, setPageIndex] = React.useState(0)
     var rowIndex = pageIndex*10
     createRowsViews(requisicoes)
     const [rowsState, setRows] = React.useState(rows)
-    if(rowsState.length !== 0){
+    const [totalReqsState, setTotalReqs] = React.useState(totalReqs)
+    var lastkey = requisicoesState.slice(-1)[0]["timeinmillis"]
+    //console.log(lastkey)
+    if(totalReqsState !== 0){
        rowsToPages()
        var index = pageIndex
         //Provavelmente terei que adicionar o código para retroceder uma página
@@ -56,17 +61,17 @@ function Table(props) {
 function definirMensagem(){
     var inicio = index * 10 + 1
     var fim = index * 10 + pages[index].length
-    mensagem = `Exibindo ${inicio}-${fim} de ${rowsState.length} requisicões.`
+    mensagem = `Exibindo ${inicio}-${fim} de ${totalReqsState} requisicões.`
 }
 
 function rowsToPages(){
-    var nRequisicoes = rowsState.length
+    var nRequisicoes = totalReqsState
     var nPaginas = Math.ceil(nRequisicoes / 10)
 
     for (let i = 0; i < nPaginas; i++) {
         var rowsPage = [];
         for (let j = i * 10; j < i * 10 + 10; j++) {
-            if (rowsState.length > j) {
+            if (requisicoesState > j) {
                 rowsPage.push(rowsState[j])
             }
         }
@@ -128,8 +133,25 @@ function nextRows() {
     if (pageIndex < pages.length) {
         setPageIndex((prevIndex) => {
             let newIndex = prevIndex + 1;
+            fetch(`requisicoes/${newIndex}`, {
+                method: 'POST',
+                body: JSON.stringify(
+                    {
+                      lastkey: lastkey
+                    }
+                  )
+             
+              }).then(response => response.json())
+                .then(newData => {
+                  setRequisicoes((reqs) => {
+                      var newReqs = reqs
+                      newReqs.splice(-1, 0, ...newData)
+                      return newReqs
+                  })
+                })
             return newIndex
         })
+        
     }
 }
 
@@ -137,6 +159,21 @@ function previousRows() {
     if (pageIndex > 0) {
         setPageIndex((prevIndex) => {
             let newIndex = prevIndex - 1;
+            fetch(`requisicoes/${newIndex}`, {
+                method: 'POST',
+                body: JSON.stringify(
+                    {
+                      lastkey: lastkey
+                    }
+                  )
+              }).then(response => response.json())
+                .then(newData => {
+                  setRequisicoes((reqs) => {
+                      var newReqs = reqs
+                      newReqs.splice(-1, 0, ...newData)
+                      return newReqs
+                  })
+                })
             return newIndex
         })
     }
@@ -182,13 +219,11 @@ function LinhaReq(props) {
 
     function deny() {
         answerReq(-1)
-        //dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(-1)
         props.update(props.index)
     }
 
     function confirm() {
         answerReq(1)
-        //dbRef.child('dados/requisicoes/' + props.usuario.idUsuario + "/" + props.requisicao.requisicaoID + "/statusRequisicao").set(1)
         props.update(props.index)
     }
 
