@@ -47,21 +47,21 @@ def requisicoes_view(request):
 @csrf_exempt
 def getReqData(request, index):
     #Index indicará a página selecionada
-    
     usuarios = []
     onibus = []
     usuariosIDs = []
     requisicoes = []
     totalReqs = db.child("dados/requisicoes/dados/numPendentes").get().val()
+    
     # Falha ao tentar filtrar dados do firebase.
     if(request.method == "GET"): 
         dbRequisicoes = db.child("dados/requisicoes/lista")\
-        .order_by_child("timeinmillis").limit_to_last(10).get().val()
+        .order_by_child("timeinmillis").start_at(1).limit_to_first(10).get().val()
     else: 
         data = json.loads(request.body)
         lastkey = data.get("lastkey", "")
         dbRequisicoes = db.child("dados/requisicoes/lista")\
-        .order_by_child("timeinmillis").start_at(lastkey).limit_to_last(10).get().val()
+        .order_by_child("timeinmillis").start_at(lastkey).limit_to_first(11).get().val()
         
     # Retorna permissão negada, embora o usuário esteja autenticado. No aplicativo, o mesmo código em java funciona perfeitamente. 
     
@@ -95,18 +95,38 @@ def answerReq(request):
         return JsonResponse({"error": "POST request required."}, status=400)
     data = json.loads(request.body)
     reqId = data.get("reqId", "")
-    userId = data.get("userId", "")
     status = data.get("status", "")
     db.child(f"dados/requisicoes/lista/{reqId}/statusRequisicao").set(status)
-    
+    db.child(f"dados/requisicoes/lista/{reqId}/timeinmillis").set(0)
+    numPendentes = db.child("dados/requisicoes/dados/numPendentes").get().val()
+    db.child("dados/requisicoes/dados/numPendentes").set(numPendentes - 1)
     if(status == 1):
         numConfirmadas = db.child("dados/requisicoes/dados/numConfirmadas").get().val()
         db.child("dados/requisicoes/dados/numConfirmadas").set(numConfirmadas + 1)
+        reservarVaga(data)
     else:
         numNegadas = db.child("dados/requisicoes/dados/numNegadas").get().val()
         db.child("dados/requisicoes/dados/numNegadas").set(numNegadas + 1)
-        
-    numPendentes = db.child("dados/requisicoes/dados/numPendentes").get().val()
-    db.child("dados/requisicoes/dados/numPendentes").set(numPendentes - 1)
-
     return JsonResponse({"message": "Request aswered successfully."}, status=201)
+
+def reservarVaga(data):
+    print('RESERVAR VAGA')
+    onibus = data.get("onibus", "")
+    user = data.get("user", "")
+    reqId = data.get("reqId", "")
+    db.child(f"dados/requisicoes/lista/{reqId}/vagaReservada").set(True)
+    print(onibus)
+    try:
+        nextIndexPassageiro = len(onibus["listaPassageiros"])
+    except:
+        nextIndexPassageiro = 0
+    print(nextIndexPassageiro)
+    onibusData = onibus["data"]
+    onibusTurno = onibus["turnoPadrao"]
+    onibusNome = onibus["nome"]
+    userId = user["idUsuario"]
+    nVagasOcupadas = nextIndexPassageiro + 1
+    db.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/listaPassageiros/{nextIndexPassageiro}").set(userId)
+    db.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/vagasOcupadas").set(nVagasOcupadas)
+    
+    

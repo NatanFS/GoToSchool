@@ -1,7 +1,6 @@
 function Table(props) {
     var dados = props.data
     var onibusLista = props.data.onibusLista
-    console.log(dados)
     var rows = []
     var pages = new Array();
     var usuarios = []
@@ -10,33 +9,46 @@ function Table(props) {
     var btnLeftStyle = {}
     var btnRightStyle = {}
     var pageSelecionada;
+    var pageIndex;
     var totalReqs = props.data.totalReqs
     recuperarUsuarios()
     recuperarRequisicoes()
-    console.log(usuarios)
-    console.log(requisicoes)
-    console.log(onibusLista)
-    const [requisicoesState, setRequisicoes] = React.useState(requisicoes)
-    const [pageIndex, setPageIndex] = React.useState(0)
-    var rowIndex = pageIndex*10
+   
+    const [dataState, setData] = React.useState({"usuarios": usuarios,
+                                                "requisicoes": requisicoes,
+                                                "onibusLista": onibusLista,
+                                                "reactRows": rows,
+                                                "totalReqs": totalReqs,
+                                                "pageIndex": 0,})
+    usuarios = dataState.usuarios
+    pageIndex = dataState.pageIndex
+    onibusLista = dataState.onibusLista
+    totalReqs = dataState.totalReqs
+    requisicoes = dataState.requisicoes
+
+    var rowIndex = 0
     createRowsViews(requisicoes)
     const [rowsState, setRows] = React.useState(rows)
-    const [totalReqsState, setTotalReqs] = React.useState(totalReqs)
-    var lastkey = requisicoesState.slice(-1)[0]["timeinmillis"]
+    rows = rowsState
+    if(requisicoes){
+        var lastkey = requisicoes.slice(-1)[0]["timeinmillis"]
+    }
     //console.log(lastkey)
-    if(totalReqsState !== 0){
-       rowsToPages()
-       var index = pageIndex
+    if(totalReqs !== 0){
+       
         //Provavelmente terei que adicionar o código para retroceder uma página
         //caso não haja mais requisições na última página.
         if (!pages[pageIndex]) {
-            index--;
-            setPageIndex((state) => {
-                return index;
+            pageIndex--; 
+            setData((state) => {
+                return {
+                    ...state,
+                    "pageIndex": pageIndex
+                };
             })
         }
-        console.log("INDEX: " + index)
-        pageSelecionada = pages[index]
+        console.log("INDEX: " + pageIndex)
+        pageSelecionada = pages[pageIndex]
         console.log(pages)
         definirMensagem()
         definirVisibilidadeBtn()
@@ -45,6 +57,7 @@ function Table(props) {
         definirVisibilidadeBtn()
     }
     
+    getNewReqs()
 
     return (<div className="text-center">
         <TableData rows={pageSelecionada}>
@@ -59,39 +72,47 @@ function Table(props) {
     </div>)
 
 function definirMensagem(){
-    var inicio = index * 10 + 1
-    var fim = index * 10 + pages[index].length
-    mensagem = `Exibindo ${inicio}-${fim} de ${totalReqsState} requisicões.`
+    var inicio = pageIndex * 10 + 1
+    var fim = pageIndex * 10 + pages[pageIndex].length
+    mensagem = `Exibindo ${inicio}-${fim} de ${totalReqs} requisicões.`
 }
 
 function rowsToPages(){
-    var nRequisicoes = totalReqsState
+    var nRequisicoes = totalReqs
     var nPaginas = Math.ceil(nRequisicoes / 10)
-
     for (let i = 0; i < nPaginas; i++) {
         var rowsPage = [];
         for (let j = i * 10; j < i * 10 + 10; j++) {
-            if (requisicoesState > j) {
-                rowsPage.push(rowsState[j])
+            if (requisicoes.length > j) {
+                rowsPage.push(rows[j])
             }
         }
         pages[i] = rowsPage
     }
-    console.log(pages)
+    console.log(rows)
 }
 function createRowsViews(requisicoes){
+    console.log("CREATE ROWS")
     requisicoes.forEach((req) => {
-        let selectedUser = getUserFromReq(req)
-        createRowView(req, selectedUser)
+        createRowView(req)
     })
+    rowsToPages()
 }
 
-function createRowView(req, user){
+function createRowView(req){
+    let selectedUser = getUserFromReq(req)
+        let selectedOnibus;
+        onibusLista.forEach((onibus) => {
+            if(onibus.onibusTurnoID == req.onibusID){
+                selectedOnibus = onibus
+            }
+        })
     rowIndex++;
-    var row = (<LinhaReq requisicao={req} usuario={user}
+    console.log(rowIndex)
+    var row = (<LinhaReq requisicao={req} usuario={selectedUser} onibus={selectedOnibus}
         index={rowIndex} update={update} />)
+        console.log(rows)
     rows.push(row)
-    
 }
 
 function getUserFromReq(req){
@@ -112,71 +133,109 @@ function recuperarRequisicoes(){
     requisicoes = dados.requisicoes
 }
 
-function update(index) {
-    var updatedRows = []
-    console.log("Index a ser removido: " + index)
-    setRows(function (prevRows) {
-        for (let i = 0; i < prevRows.length; i++) {
-            if (prevRows[i].props.index !== index) {
-                updatedRows.push(prevRows[i])
-            } else {
-                console.log(prevRows[i])
+function update(reqID) {
+    var updatedReqs = []
+    setData((data) => {
+        let totalReqs = data.totalReqs
+        totalReqs--
+        for (let i = 0; i < data.requisicoes.length; i++) {
+            if (data.requisicoes[i].requisicaoID !== reqID) {
+                updatedReqs.push(data.requisicoes[i])
             }
         }
-        console.log(updatedRows)
-        return updatedRows
+        console.log(updatedReqs)
+        return {...data, "requisicoes": updatedReqs, "totalReqs": totalReqs}
     })
 }
 
 
 function nextRows() {
-    if (pageIndex < pages.length) {
-        setPageIndex((prevIndex) => {
-            let newIndex = prevIndex + 1;
-            fetch(`requisicoes/${newIndex}`, {
-                method: 'POST',
-                body: JSON.stringify(
-                    {
-                      lastkey: lastkey
+    if (pageIndex < pages.length && !pages[pageIndex+1].length > 0) {
+        fetch(`requisicoes/${pageIndex}`, {
+            method: 'POST',
+            body: JSON.stringify(
+                {
+                  lastkey: lastkey
+                }
+              )
+         
+          }).then(response => response.json())
+            .then(response => {
+                setData(() => {
+                    console.log(response)
+                    let data = JSON.parse(response)
+                    data.requisicoes.shift() //Remove a primeira requisição, que será repetida.                    
+                    let nPageIndex = pageIndex + 1
+                    let nUsuarios = usuarios.concat(data.usuarios)                 
+                    let nRequisicoes = requisicoes.concat(data.requisicoes)
+                    let nOnibusLista = onibusLista.concat(data.onibusLista)
+                    let nTotalReqs = data.totalReqs
+                    console.log(nRequisicoes)
+                    console.log(data.requisicoes)
+                    let newData = {
+                        "usuarios": nUsuarios,
+                        "pageIndex": nPageIndex,
+                        "requisicoes": nRequisicoes,
+                        "onibusLista": nOnibusLista,
+                        "totalReqs": nTotalReqs
                     }
-                  )
-             
-              }).then(response => response.json())
-                .then(newData => {
-                  setRequisicoes((reqs) => {
-                      var newReqs = reqs
-                      newReqs.splice(-1, 0, ...newData)
-                      return newReqs
-                  })
+                    console.log(newData)
+                    return newData
                 })
-            return newIndex
-        })
+            })
         
+    } else {
+        setData((data) => {
+            let nPageIndex = pageIndex + 1
+            return {...data, "pageIndex": nPageIndex}
+        })
+    }
+}
+
+function getNewReqs(){
+    //Executar se a próxima página ainda não estiver no cache
+    if(pages[pageIndex + 1] && !pages[pageIndex + 1].length > 0 ){
+        fetch(`requisicoes/${pageIndex}`, {
+            method: 'POST',
+            body: JSON.stringify(
+                {
+                  lastkey: lastkey
+                }
+              )
+         
+          }).then(response => response.json())
+            .then(response => {
+                setData((oldData) => {
+                    console.log(response)
+                    let data = JSON.parse(response)
+                    data.requisicoes.shift() //Remove a primeira requisição, que será repetida.                    
+                    let nUsuarios = usuarios.concat(data.usuarios)                 
+                    let nRequisicoes = requisicoes.concat(data.requisicoes)
+                    let nOnibusLista = onibusLista.concat(data.onibusLista)
+                    let nTotalReqs = data.totalReqs
+                    console.log(nRequisicoes)
+                    console.log(data.requisicoes)
+                    let newData = {
+                        ...oldData,
+                        "usuarios": nUsuarios,
+                        "requisicoes": nRequisicoes,
+                        "onibusLista": nOnibusLista,
+                        "totalReqs": nTotalReqs
+                    }
+                    console.log(newData)
+                    return newData
+                })
+            })
     }
 }
 
 function previousRows() {
-    if (pageIndex > 0) {
-        setPageIndex((prevIndex) => {
-            let newIndex = prevIndex - 1;
-            fetch(`requisicoes/${newIndex}`, {
-                method: 'POST',
-                body: JSON.stringify(
-                    {
-                      lastkey: lastkey
-                    }
-                  )
-              }).then(response => response.json())
-                .then(newData => {
-                  setRequisicoes((reqs) => {
-                      var newReqs = reqs
-                      newReqs.splice(-1, 0, ...newData)
-                      return newReqs
-                  })
-                })
-            return newIndex
-        })
-    }
+
+    setData((data) => {
+        let pageIndex = data.pageIndex
+        pageIndex--
+        return {...data, "pageIndex": pageIndex}
+    })
 }
 
 
@@ -219,12 +278,12 @@ function LinhaReq(props) {
 
     function deny() {
         answerReq(-1)
-        props.update(props.index)
+        props.update(props.requisicao.requisicaoID)
     }
 
     function confirm() {
         answerReq(1)
-        props.update(props.index)
+        props.update(props.requisicao.requisicaoID)
     }
 
     function answerReq(status){
@@ -233,7 +292,8 @@ function LinhaReq(props) {
             body: JSON.stringify(
               {
                 reqId: props.requisicao.requisicaoID,
-                userId:  props.usuario.idUsuario,
+                user:  props.usuario,
+                onibus: props.onibus,
                 status: status,
               }
             )
