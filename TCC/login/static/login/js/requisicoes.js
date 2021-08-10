@@ -3,11 +3,12 @@ ReactDOM.render(<TableCarregando/>,
     document.querySelector('main'))
     
 //Faz a requisição dos dados para o servidor
-fetch('requisicoes/0')
+fetch('requisicoes/api')
 .then(response => response.json())
 .then(response => {
     var response = JSON.parse(response)
     var data = response
+    console.log("dados recuperados")
     inicializarTabela(data)
 })
 

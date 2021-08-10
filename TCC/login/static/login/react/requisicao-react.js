@@ -26,8 +26,6 @@ function TableData(props) {
 }
 
 function LinhaReq(props) {
-
-    var dbRef = firebase.database().ref();
     const rowAnimation = {
         "animation-name": "hide",
         "animation-duration": "1s",

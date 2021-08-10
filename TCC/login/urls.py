@@ -6,6 +6,6 @@ urlpatterns = [
     path('login', views.login_view, name=("login")),
     path('logout', views.logout_view, name=("logout")),
     path('requisicoes', views.requisicoes_view, name=('requisicoes')),
-    path('requisicoes/<int:index>', views.getReqData, name=('reqData')),
+    path('requisicoes/api', views.getReqData, name=('reqData')),
     path('requisicoes/answer', views.answerReq, name=("answerReq")),
 ]

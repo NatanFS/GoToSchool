@@ -75,3 +75,26 @@ tr{
 
 }
 
+.newRequestsAlert{
+    background-color: rgb(151, 5, 5);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    margin: auto;
+    padding: 6px;
+    color: white;
+    visibility: visible;
+    width: 600px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.5s, bottom 0.5s, visibility 0.5s;
+}
+
+.toast--visible{
+    bottom:20px;
+    opacity: 1;
+    visibility: visible;
+}
