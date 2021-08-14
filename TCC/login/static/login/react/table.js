@@ -38,12 +38,12 @@ function Table(props) {
 
     let init = false
     firebase.database().ref("dados/requisicoes/lista").limitToLast(1).on('child_added', (snap, prev) => {
-        if(init){
+        if (init) {
             Toast.show("Novas requisições foram realizadas. Clique aqui para recarregar a página.", "")
         }
-       init = true
+        init = true
     })
-    
+
     if (requisicoes.length > 0) {
         var lastkey = requisicoes.slice(-1)[0]["timeinmillis"]
     }
@@ -177,7 +177,7 @@ function Table(props) {
         if (pages[pageIndex + 1] &&
             !pages[pageIndex + 1].length > 0 &&
             !nextPageLoaded) {
-                console.log("RECUPERAR NOVAS REQS")
+            console.log("RECUPERAR NOVAS REQS")
             fetch(`requisicoes/api`, {
                 method: 'POST',
                 body: JSON.stringify(
@@ -247,6 +247,7 @@ function LinhaReq(props) {
         "animation-duration": "1s",
         "animation-fill-mode": "forwards",
         "animation-play-state": "paused",
+        "font-weight": "normal"
     }
 
     const btnAnimation = {
@@ -272,7 +273,7 @@ function LinhaReq(props) {
         <tr className="requisicao" id={props.index} style={rowAnimation}>
             <td className="align-items-center" scope="row" style={style}>{props.usuario.nome}</td>
             <td className="align-items-center" style={style}>{props.requisicao.dataViagem}</td>
-            <th className="align-items-center"  style={style}>{props.requisicao.turnoViagem.charAt(0).toUpperCase() + props.requisicao.turnoViagem.slice(1)}</th>
+            <th className="align-items-center" style={style}>{props.requisicao.turnoViagem.charAt(0).toUpperCase() + props.requisicao.turnoViagem.slice(1)}</th>
             <td className="align-items-center" style={style}>{selectedBus.vagasOcupadas}/{selectedBus.vagasTotal}</td>
             <td className="align-items-center" style={style}>
                 <input class="button" id="btn-confirm" style={btnAnimation} onClick={confirm} type="image" src="../static/login/img/confirm-button.png" value="" id="button-confirm" />
@@ -313,7 +314,7 @@ function TableData(props) {
     var rows = props.rows
     var emptyRows = props.emptyRows
     return (
-        <table class="table table-dark table-striped">
+        <table class="table table-light table-striped table-hover">
             <thead>
                 <tr>
                     <th scope="col">Passageiro</th>

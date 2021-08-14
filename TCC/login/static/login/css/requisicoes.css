@@ -10,18 +10,6 @@ h3{
     padding: 20px 0px 20px 35px;
 }
 
-body{
-    background-color: #2a2e33;
-    color: white;
-    font-family: sans-serif;
-}
-
-tr{
-    overflow: hidden;
-    height: 0px!important;
-    height: 0.01px!important; max-height:0.01px!important;
-}
-
 @keyframes hide-btn{
     0%{
         height: 30px;
@@ -71,14 +59,14 @@ tr{
 
 
 .fas{
-    color: #ffffff;
+    color: black;
 
 }
 
 .newRequestsAlert{
     background-color: rgb(151, 5, 5);
     position: fixed;
-    left: 0;
+    left: 240px;
     right: 0;
     bottom: 0px;
     margin: auto;

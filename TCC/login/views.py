@@ -26,11 +26,8 @@ credentials_google = {
 
 cred = credentials.Certificate(credentials_google)
 firebase_admin.initialize_app(cred)
-db = firestore.client()
-collection = db.collection('dados')
-doc = collection.document('requisicoesDados')
 firebase = initialize_firebase()
-db = firebase.database()
+dbRealtime = firebase.database()
 
 # Create your views here.
 def login_view(request):
@@ -55,7 +52,7 @@ def index(request):
     if user.is_anonymous:
         return HttpResponseRedirect(reverse("login"))
     else:
-        return render(request, 'login/index.html', {"user": user})
+        return render(request, 'login/index.html', {"user": user, "title": "Home"})
     
 def logout_view(request):
     logout(request)
@@ -63,7 +60,7 @@ def logout_view(request):
 
 @login_required
 def requisicoes_view(request):
-    return render(request, "login/requisicoes.html")
+    return render(request, "login/requisicoes.html", {"title": "Responder requisições"})
 
 @csrf_exempt
 def getReqData(request):
@@ -73,16 +70,19 @@ def getReqData(request):
     usuariosIDs = []
     requisicoes = []
     lastkey = ""
+    dbFirestore = firestore.client()
+    collection = dbFirestore.collection('dados')
+    doc = collection.document('requisicoesDados')
     requisicoesDados = doc.get().to_dict()
     
     if(requisicoesDados["numPendentes"] > 0):
         if(request.method == "GET"): 
-            dbRequisicoes = db.child("dados/requisicoes/lista")\
+            dbRequisicoes = dbRealtime.child("dados/requisicoes/lista")\
             .order_by_child("timeinmillis").start_at(1).limit_to_first(10).get().val()
         else: 
             data = json.loads(request.body)
             lastkey = data.get("lastkey", "")
-            dbRequisicoes = db.child("dados/requisicoes/lista")\
+            dbRequisicoes = dbRealtime.child("dados/requisicoes/lista")\
             .order_by_child("timeinmillis").start_at(lastkey).limit_to_first(11).get().val()
 
         for key in dbRequisicoes:
@@ -91,11 +91,11 @@ def getReqData(request):
             usuarioID = req["usuarioID"]
             if(not usuarioID in usuariosIDs):
                 usuariosIDs.append(usuarioID)
-            bus = recuperarOnibus(req, db)
+            bus = recuperarOnibus(req, dbRealtime)
             if(not bus in onibus):
                 onibus.append(bus)
         for id in usuariosIDs:
-            usuarioDados = db.child("dados").child("usuarios").child(id).get().val()
+            usuarioDados = dbRealtime.child("dados").child("usuarios").child(id).get().val()
             usuarios.append(usuarioDados)
         lastkey = requisicoes[-1]["timeinmillis"],
     data = {
@@ -123,10 +123,10 @@ def answerReq(request):
     docUsuarioDados = collection.document(usuarioID)
     
     print("Token: " + token)
-    db.child(f"dados/requisicoes/lista/{reqId}/statusRequisicao").set(status)
-    db.child(f"dados/requisicoes/lista/{reqId}/timeinmillis").set(0)
+    dbRealtime.child(f"dados/requisicoes/lista/{reqId}/statusRequisicao").set(status)
+    dbRealtime.child(f"dados/requisicoes/lista/{reqId}/timeinmillis").set(0)
     doc.update({'numPendentes': Increment(-1)})
-    altConfirmadas = db.child(f"dados/usuarios/{usuarioID}/altConfirmadas").get().val()
+    altConfirmadas = dbRealtime.child(f"dados/usuarios/{usuarioID}/altConfirmadas").get().val()
     if(status == 1):
         doc.update({'numConfirmadas': Increment(1)})
         docUsuarioDados.update({"altConfirmadas": Increment(1)})
@@ -161,7 +161,7 @@ def reservarVaga(data):
     onibus = data.get("onibus", "")
     user = data.get("user", "")
     reqId = data.get("reqId", "")
-    db.child(f"dados/requisicoes/lista/{reqId}/vagaReservada").set(True)
+    dbRealtime.child(f"dados/requisicoes/lista/{reqId}/vagaReservada").set(True)
     print(onibus)
     try:
         nextIndexPassageiro = len(onibus["listaPassageiros"])
@@ -173,7 +173,7 @@ def reservarVaga(data):
     onibusNome = onibus["nome"]
     userId = user["idUsuario"]
     nVagasOcupadas = nextIndexPassageiro + 1
-    db.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/listaPassageiros/{nextIndexPassageiro}").set(userId)
-    db.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/vagasOcupadas").set(nVagasOcupadas)
+    dbRealtime.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/listaPassageiros/{nextIndexPassageiro}").set(userId)
+    dbRealtime.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/vagasOcupadas").set(nVagasOcupadas)
     
     

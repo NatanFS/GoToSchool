@@ -1,8 +1,138 @@
-body, html{
+body{
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: scroll;
+}
+
+.sidebar{
+    position: fixed;
+    top: 0;
+    left: 0;
     height: 100%;
-    background-color: #2a2e33!important;
+    width: 78px;
+    padding: 10px 14px;
+    background:rgb(7, 7, 70) ;
+    transition: all 0.5s ease;
+}
+
+.sidebar.active{
+    width: 240px;
+}
+
+.sidebar .logo_content .logo {
+    opacity: 0;
+    height: 23px;
+    
+}
+
+.sidebar.active .logo_content .logo {
+    color: #fff;
+    height: 50px;
+    width: 100%;
+    opacity: 1;
+    margin-top: 20px;
+    align-items: center;
+    text-align: center;
+    transition: all 0.5s ease;
+}
+
+.logo_name{
+    font-size: 28px;
+    font-weight: 400;
+}
+
+.logo i{
+    font-size: 28px;
     color: white;
-    font-family: sans-serif;
+}
+
+.sidebar #btn{
+    color: white;
+    font-size: 24px;
+    position: absolute;
+    border-radius: 20px;
+    left: 50%;
+    top: 6px;
+    transform: translateX(-50%);
+    line-height: 30px;
+}
+
+.sidebar.active #btn{
+    width: 240px;
+    transform: translateX(0%);
+    left: 88%;
+}
+
+.sidebar.active .links_name{
+    opacity: 1;
+}
+
+.sidebar .links_name{
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.sidebar ul{
+    margin-top: 15px;
+}
+
+.sidebar ul li{
+    position: relative;
+    height: 50px;
+    width: 100%;
+    list-style: none;
+    border-radius: 50px;
+    margin: 0px 5px;
+}
+
+.sidebar ul li a{
+    color: white;
+    display: flex;
+    line-height: 50px;
+    height: 50px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 50px ;
+    padding-left: 0px;
+    text-align: center;
+    align-items: center;
+    transition: all 0.4s;
+}
+
+.sidebar ul li a:hover{
+    color: rgb(7, 7, 70);
+    background: white;
+    display: flex;
+}
+
+.sidebar ul li a i{
+    height: 50px;
+    min-width: 50px;
+    line-height: 50px;
+    font-size: 20px;
+    transform: translateX(-10%);
+}
+
+.nav_list{
+    padding: 0px;
+}
+
+
+
+.footer{
+    width: calc(100% - 240px);
+    left: 240px;
+}
+
+.sidebar hr{
+    color: white;
+    margin-top: 5px !important;
+    background-color: white!important;
+    opacity: 1!important;
+    align-items: center;
+    text-align: center;
+    width: 100%;
 }
 
 footer{
@@ -13,10 +143,31 @@ nav{
     margin-bottom: 10px;
 }
 
-.body-content{
-    border-radius: 20px;
-    background-color: #4c535c;
-    min-height: 100% - 56px;
-    margin-top: 10px;
-    padding: 10px;
+.body_content {
+    position: absolute;
+    height: 100%;
+    width: calc(100% - 78px);
+    left: 78px;
+    transition: all 0.5s ease;
+}
+
+h2{
+    padding: 10px 0px 5px 10px;
+}
+
+.body_content hr{
+    background-color: black;
+    height: 2px;
+    margin: 16px 0px 0px 0px;
+}
+
+.log-out li{
+    position: absolute;
+    bottom: 5px;
+}
+
+.sidebar.active ~ .body_content{
+    width: calc(100% - 240px);
+    left: 240px;
+    
 }
