@@ -1,0 +1,48 @@
+{% extends 'login/layout.html' %}
+{% load static %}
+{% block body %}
+
+{% if messages %}
+    <div class="messages" data-dismiss="alert" style="text-align:center;">
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        <div class="alert alert-success success" role="alert">
+            {{ message }}
+        </div>
+        {% elif message.tags == 'warning' %}
+        <div class="alert alert-warning" role="alert">
+            {{ message }}
+        </div>
+        {% elif message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<link rel="stylesheet" href="{% static 'login/css/cadastro.css' %}">
+<div class="form-container container col-sm-12 col-md-8 col-xl-6 mx-auto text-center">
+    <h4>Formulário de cadastro</h4>
+    <form method="POST">
+        {% csrf_token %}
+            {% for field in form %}
+            <div class="fieldWrapper">
+                <div class="error-messages">
+                    {{ field.errors }}
+                </div>
+                 <div class="form-group">
+                    {{ field }}
+                 </div>
+            </div>
+            {% endfor %}
+     
+        <div class="d-grid gap-2 ">
+            <input class="btn btn-primary " type="submit" value="Cadastrar">
+        </div>
+        
+    </form>
+    
+</div>
+{% endblock %}

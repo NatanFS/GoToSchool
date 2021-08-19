@@ -1,3 +1,5 @@
+from login.models import User
+from login.forms import CadastrarStaffForm
 from django.http.response import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 import firebase_admin
@@ -9,7 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from firebase_admin import credentials, firestore
 from pyfcm import FCMNotification
+from django.views.generic import CreateView
 from google.cloud.firestore_v1 import Increment
+from django.contrib import messages
 
 credentials_google = {
     "type": "service_account",
@@ -120,6 +124,9 @@ def answerReq(request):
     user = data.get("user", "")
     token = user["token"]
     usuarioID = user["idUsuario"]
+    dbFirestore = firestore.client()
+    collection = dbFirestore.collection('dados')
+    doc = collection.document('requisicoesDados')
     docUsuarioDados = collection.document(usuarioID)
     
     print("Token: " + token)
@@ -175,5 +182,21 @@ def reservarVaga(data):
     nVagasOcupadas = nextIndexPassageiro + 1
     dbRealtime.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/listaPassageiros/{nextIndexPassageiro}").set(userId)
     dbRealtime.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/vagasOcupadas").set(nVagasOcupadas)
+    
+class CadastrarStaff(CreateView):
+    model = User
+    form_class = CadastrarStaffForm
+    template_name = 'login/cadastro-staff.html'
+    extra_context = {"title": "Cadastrar administradores."}   
+    success_url = "cadastrar-staff"
+    def get_success_url(self):
+        return reverse("cadastrar-staff")
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.set_password(form.cleaned_data["password1"])
+        user.email = form.cleaned_data["username"]
+        user.save()
+        messages.success(self.request, "Usuário administrador adicionado com sucesso!")
+        return super().form_valid(form)
     
     

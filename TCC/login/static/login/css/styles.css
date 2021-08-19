@@ -161,9 +161,15 @@ h2{
     margin: 16px 0px 0px 0px;
 }
 
-.log-out li{
+.log-out{
+    color: white;
+    font-size: 24px;
     position: absolute;
-    bottom: 5px;
+    border-radius: 20px;
+    left: 50%;
+    top: 6px;
+    transform: translateX(-50%);
+    line-height: 30px;
 }
 
 .sidebar.active ~ .body_content{
