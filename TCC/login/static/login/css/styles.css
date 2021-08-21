@@ -51,11 +51,21 @@ body{
     color: white;
     font-size: 24px;
     position: absolute;
-    border-radius: 20px;
+    border-radius: 10px;
     left: 50%;
     top: 6px;
     transform: translateX(-50%);
     line-height: 30px;
+}
+
+.sidebar #btn:hover{
+    padding-bottom: 1px;
+    padding-top: 1px;
+    padding-left: 4px;
+    padding-right: 4px;
+    color: rgb(7, 7, 70);
+    background: white;
+    display: flex;
 }
 
 .sidebar.active #btn{
@@ -63,6 +73,8 @@ body{
     transform: translateX(0%);
     left: 88%;
 }
+
+
 
 .sidebar.active .links_name{
     opacity: 1;
@@ -97,7 +109,7 @@ body{
     padding-left: 0px;
     text-align: center;
     align-items: center;
-    transition: all 0.4s;
+    transition: all 0.2s;
 }
 
 .sidebar ul li a:hover{
@@ -163,17 +175,19 @@ h2{
 
 .log-out{
     color: white;
-    font-size: 24px;
     position: absolute;
-    border-radius: 20px;
-    left: 50%;
-    top: 6px;
-    transform: translateX(-50%);
+    bottom: 5px;
+    display: block;
+    width: 78px;
     line-height: 30px;
 }
+
+.sidebar.active .log-out{
+    width: 210px;
+}
+
 
 .sidebar.active ~ .body_content{
     width: calc(100% - 240px);
     left: 240px;
-    
 }
