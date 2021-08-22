@@ -2,75 +2,46 @@
     margin-right: 5px;
 }
 
-table{
+.table {
     text-align: center;
+    height: calc(100% - 70px);
+    margin-bottom: 0px!important;
 }
 
 h3{
     padding: 20px 0px 20px 35px;
 }
 
-body{
-    background-color: #2a2e33;
-    color: white;
-    font-family: sans-serif;
-}
-
-tr{
-    overflow: hidden;
-    height: 0px!important;
-    height: 0.01px!important; max-height:0.01px!important;
-}
-
-@keyframes hide-btn{
-    0%{
-        height: 30px;
-        width: 30px;
-        opacity: 1;
-        display: block;
-    }
-
-    100%{
-        opacity: 0;
-        display: none;
-        height: 0px;
-        width: 0px;
-        padding: 0px;
-        margin: 0px;
-    }
-}
-
-@keyframes hide{
-    0%{
-        opacity: 1;
-        height: 100%;
-        line-height: 100%;
-        
-    }
-
-    75%{
-        opacity: 0;
-        height: 0;
-        line-height: 0px;
-        margin:0;
-        padding-bottom:0;
-        padding-top:0;
-    }
-
-    100%{
-        opacity: 0;
-        height: 0;
-        line-height: 0px;
-        padding-bottom:0;
-        padding-top:0;
-        margin:0;
-        padding:0;
-    }
-}
-
-
 
 .fas{
-    color: #ffffff;
+    color: black;
 
+}
+
+.newRequestsAlert{
+    background-color: rgb(151, 5, 5);
+    position: fixed;
+    left: 240px;
+    right: 0;
+    bottom: 0px;
+    margin: auto;
+    padding: 6px;
+    color: white;
+    visibility: visible;
+    width: 600px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.5s, bottom 0.5s, visibility 0.5s;
+}
+
+.toast--visible{
+    bottom:20px;
+    opacity: 1;
+    visibility: visible;
+}
+
+.button{
+    height: 30px;
 }

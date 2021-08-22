@@ -1,5 +1,11 @@
+h1{
+    color: gray!important;
+    margin-left: 20px!important;
+}
+
 h3{
     padding-bottom: 200px;
-    background-color: #2a2e33;
-    color: white;
+    color: black;
 }
+
+body{overflow: hidden;}
