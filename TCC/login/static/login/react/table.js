@@ -11,7 +11,6 @@ function Table(props) {
     var pageSelecionada;
     var nextPageLoaded
     var pageIndex;
-    var openToGetNext = true;
     var totalReqs = props.data.totalReqs
     recuperarUsuarios()
     recuperarRequisicoes()
@@ -33,6 +32,7 @@ function Table(props) {
     requisicoes = dataState.requisicoes
     var rowIndex = 0
     createRowsViews(requisicoes)
+    
     const [rowsState, setRows] = React.useState(rows)
     rows = rowsState
 
@@ -76,9 +76,11 @@ function Table(props) {
     for (let i = 0; i < nLinhasVazias; i++) {
         emptyRows.push((<LinhaVazia></LinhaVazia>))
     }
-    return (<div className="text-center">
+    return (
+        <> 
         <TableData rows={pageSelecionada} emptyRows={emptyRows}>
         </TableData>
+        <div className="table-footer">
         <button className="btn" onClick={previousRows} style={btnLeftStyle}>
             <span className="fas fa-arrow-left" ></span>
         </button>
@@ -86,7 +88,9 @@ function Table(props) {
         <button className="btn" onClick={nextRows} style={btnRightStyle}>
             <span className="fas fa-arrow-right" ></span>
         </button>
-    </div>)
+        </div>
+        </>
+ )
 
 
     function definirMensagem() {
@@ -173,7 +177,7 @@ function Table(props) {
     }
 
     function getNewReqs() {
-        //Executar se a próxima página ainda não estiver no cache
+        //Executar se os dados da próxima página ainda não estiverem no cache
         if (pages[pageIndex + 1] &&
             !pages[pageIndex + 1].length > 0 &&
             !nextPageLoaded) {
@@ -220,13 +224,15 @@ function Table(props) {
 
 
     function definirVisibilidadeBtn() {
+        // Se não há página anterior, esconde o botão. 
         if (!pages[pageIndex - 1]) {
             btnLeftStyle = {
                 "display": "none"
             }
         }
-
-        if (!pages[pageIndex + 1] || pages[pageIndex + 1].length == 0) {
+        
+        // Se não há uma próxima página de requisições, esconde o botão. Caso contrário, mostra. | Se os dados da página atual ainda não tiverem sido atualizados, esconde o botão.
+        if (!pages[pageIndex + 1] || pages[pageIndex].length == 0) {
             btnRightStyle = {
                 "display": "none"
             }
@@ -235,27 +241,6 @@ function Table(props) {
 }
 
 function LinhaReq(props) {
-    const rowAnimation = {
-        "animation-name": "hide",
-        "animation-duration": "1s",
-        "animation-fill-mode": "forwards",
-        "animation-play-state": "paused",
-    }
-
-    const style = {
-        "animation-name": "hide",
-        "animation-duration": "1s",
-        "animation-fill-mode": "forwards",
-        "animation-play-state": "paused",
-        "font-weight": "normal"
-    }
-
-    const btnAnimation = {
-        "animation-name": "hide-btn",
-        "animation-duration": "0.5s",
-        "animation-fill-mode": "forwards",
-        "animation-play-state": "paused",
-    }
     var onibus = props.onibus
     const [selectedBus, setSelectedBus] = React.useState(props.onibus);
     if (props.onibus != selectedBus) {
@@ -270,14 +255,14 @@ function LinhaReq(props) {
     })
 
     return (
-        <tr className="requisicao" id={props.index} style={rowAnimation}>
-            <td className="align-items-center" scope="row" style={style}>{props.usuario.nome}</td>
-            <td className="align-items-center" style={style}>{props.requisicao.dataViagem}</td>
-            <th className="align-items-center" style={style}>{props.requisicao.turnoViagem.charAt(0).toUpperCase() + props.requisicao.turnoViagem.slice(1)}</th>
-            <td className="align-items-center" style={style}>{selectedBus.vagasOcupadas}/{selectedBus.vagasTotal}</td>
-            <td className="align-items-center" style={style}>
-                <input class="button" id="btn-confirm" style={btnAnimation} onClick={confirm} type="image" src="../static/login/img/confirm-button.png" value="" id="button-confirm" />
-                <input class="button" id="btn-deny" style={btnAnimation} onClick={deny} type="image" src="../static/login/img/deny-button2.png" value="" id="button-deny" />
+        <tr className="requisicao" id={props.index} >
+            <td className="align-items-center" scope="row">{props.usuario.nome}</td>
+            <td className="align-items-center">{props.requisicao.dataViagem}</td>
+            <th className="align-items-center">{props.requisicao.turnoViagem.charAt(0).toUpperCase() + props.requisicao.turnoViagem.slice(1)}</th>
+            <td className="align-items-center">{selectedBus.vagasOcupadas}/{selectedBus.vagasTotal}</td>
+            <td className="align-items-center">
+                <input class="button" id="btn-confirm" onClick={confirm} type="image" src="../static/login/img/confirm-button.png" value="" id="button-confirm" />
+                <input class="button" id="btn-deny" onClick={deny} type="image" src="../static/login/img/deny-button2.png" value="" id="button-deny" />
             </td>
         </tr>
     )
@@ -314,7 +299,7 @@ function TableData(props) {
     var rows = props.rows
     var emptyRows = props.emptyRows
     return (
-        <table class="table table-light table-striped table-hover">
+        <table class="table table-light table-striped table-hover align-middle">
             <thead>
                 <tr>
                     <th scope="col">Passageiro</th>
@@ -334,7 +319,7 @@ function TableData(props) {
 
 function LinhaVazia() {
     return (
-        <tr style={{ "height": "30px" }}>
+        <tr>
             <th scope="row"></th>
             <td></td>
             <td></td>

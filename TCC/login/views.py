@@ -32,6 +32,10 @@ cred = credentials.Certificate(credentials_google)
 firebase_admin.initialize_app(cred)
 firebase = initialize_firebase()
 dbRealtime = firebase.database()
+dbFirestore = firestore.client()
+collection = dbFirestore.collection('dados')
+doc = collection.document('requisicoesDados')
+
 
 # Create your views here.
 def login_view(request):
@@ -74,9 +78,6 @@ def getReqData(request):
     usuariosIDs = []
     requisicoes = []
     lastkey = ""
-    dbFirestore = firestore.client()
-    collection = dbFirestore.collection('dados')
-    doc = collection.document('requisicoesDados')
     requisicoesDados = doc.get().to_dict()
     
     if(requisicoesDados["numPendentes"] > 0):
@@ -124,9 +125,8 @@ def answerReq(request):
     user = data.get("user", "")
     token = user["token"]
     usuarioID = user["idUsuario"]
-    dbFirestore = firestore.client()
+    
     collection = dbFirestore.collection('dados')
-    doc = collection.document('requisicoesDados')
     docUsuarioDados = collection.document(usuarioID)
     
     print("Token: " + token)
