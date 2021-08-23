@@ -2,7 +2,7 @@ body{
     position: relative;
     min-height: 100vh;
     width: 100%;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .sidebar{
@@ -85,15 +85,24 @@ body{
     transition: all 0.3s ease;
 }
 
-.sidebar ul{
-    margin-top: 15px;
-}
-
 .sidebar ul li{
     position: relative;
     height: 50px;
     width: 100%;
     list-style: none;
+    padding-left: 5px;
+    transform: translateX(-15%);
+    border-radius: 50px;
+    margin: 0px 5px;
+}
+
+.sidebar.active ul li{
+    position: relative;
+    height: 50px;
+    width: 100%;
+    list-style: none;
+    padding-left: 5px;
+    transform: translateX(-5px);
     border-radius: 50px;
     margin: 0px 5px;
 }
@@ -128,9 +137,14 @@ body{
 
 .nav_list{
     padding: 0px;
+    height: calc(100% - 100px);
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-
+.sidebar.active .nav_list{
+    height: calc(100% - 150px);
+}
 
 .footer{
     width: calc(100% - 240px);
@@ -177,8 +191,9 @@ h2{
     color: white;
     position: absolute;
     bottom: 5px;
+    left: 10px;
     display: block;
-    width: 78px;
+    width: 50px;
     line-height: 30px;
 }
 
@@ -192,3 +207,24 @@ h2{
     width: calc(100% - 240px);
     left: 240px;
 }
+
+/* width */
+::-webkit-scrollbar {
+    width: 3px;
+    transform: translateX(-50%);
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(7, 7, 70); 
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(7, 7, 70); 
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(20, 20, 197); 
+  }

@@ -58,15 +58,50 @@
                 <span class="links_name">Requisições</span>
               </a>
             </li>
-          {% if user.is_superuser %}
-          
+            <li>
+              <a class="nav-link" href="{% url 'requisicoes' %}">
+                <i class='bx bxs-user' ></i>
+                <span class="links_name">Usuários</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-link" href="{% url 'requisicoes' %}">
+                <i class='bx bxs-message-dots'></i>
+                <span class="links_name">Avisos</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-link" href="{% url 'requisicoes' %}">
+                <i class='bx bxs-user' ></i>
+                <span class="links_name">Motoristas</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-link" href="{% url 'requisicoes' %}">
+                <i class='bx bxs-bus' ></i>
+                <span class="links_name">Cadastrar Ônibus</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-link" href="{% url 'requisicoes' %}">
+                <i class='bx bxs-news' ></i>
+                <span class="links_name">Add Novidades</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-link" href="{% url 'requisicoes' %}">
+                <i class='bx bxs-envelope' ></i>
+                <span class="links_name">Ouvidoria</span>
+              </a>
+            </li>
+         {#% if user.is_superuser %#}
             <li>
               <a class="nav-link" href="{% url 'cadastrar-staff' %}">
                 <i class='bx bxs-user-plus' ></i>
-                <span class="links_name">Cadastrar Staff</span>
+                <span class="links_name">Administradores</span>
               </a>
             </li>
-          {% endif %}
+         {#% endif %#}
             <div class="log-out">
               <li>
                 <a class="nav-link" href="{% url 'logout' %}">

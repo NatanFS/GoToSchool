@@ -7,7 +7,7 @@ function TableCarregando() {
     }
 
     return (
-        <table class="table table-light table-striped table-hover">
+        <table class="table table-light table-striped table-hover align-middle">
             <thead>
                 <tr>
                     <th scope="col">#</th>

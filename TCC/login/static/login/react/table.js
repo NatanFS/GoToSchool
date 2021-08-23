@@ -44,9 +44,7 @@ function Table(props) {
         init = true
     })
 
-    if (requisicoes.length > 0) {
-        var lastkey = requisicoes.slice(-1)[0]["timeinmillis"]
-    }
+    
     if (totalReqs !== 0) {
 
         //Provavelmente terei que adicionar o código para retroceder uma página
@@ -67,7 +65,14 @@ function Table(props) {
     }
 
     definirVisibilidadeBtn()
-    getNewReqs()
+    let getReqs = async () => {
+        if(requisicoes.length < totalReqs){
+            var lastKey = await getLastKey()
+            await getNewReqs(lastKey)
+        }
+        
+    }
+    React.useEffect(getReqs, [requisicoes])
     var emptyRows = [];
     var nLinhasVazias = 10
     if (pageSelecionada != null) {
@@ -176,11 +181,10 @@ function Table(props) {
 
     }
 
-    function getNewReqs() {
-        //Executar se os dados da próxima página ainda não estiverem no cache
-        if (pages[pageIndex + 1] &&
-            !pages[pageIndex + 1].length > 0 &&
-            !nextPageLoaded) {
+    function getNewReqs(lastkey) {
+        //Executar se os dados da próxima página ainda não estiverem no cache     
+        
+        return new Promise((resolve, reject) => {
             console.log("RECUPERAR NOVAS REQS")
             fetch(`requisicoes/api`, {
                 method: 'POST',
@@ -207,11 +211,19 @@ function Table(props) {
                             "onibusLista": nOnibusLista,
                             "totalReqs": nTotalReqs
                         }
-                        console.log(nRequisicoes)
                         return newData
                     })
+                    resolve()
                 })
-        }
+        })
+    }
+
+    function getLastKey(){
+        return new Promise((resolve, reject) => {
+            var lastkey = requisicoes.slice(-1)[0]['timeinmillis']
+            console.log(lastkey)
+            resolve(lastkey)
+        })
     }
 
     function previousRows() {
