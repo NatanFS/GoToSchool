@@ -199,4 +199,7 @@ class CadastrarStaff(CreateView):
         messages.success(self.request, "Usuário administrador adicionado com sucesso!")
         return super().form_valid(form)
     
+def usuarios_view(request):
+    if request.method == "GET":
+        return render(request, "login/usuarios.html" , {'title': "Gerenciar usuários"})
     

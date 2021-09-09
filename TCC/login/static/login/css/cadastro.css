@@ -8,10 +8,7 @@ color: red;
 }
 
 .form-container{
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -70%);
+    position: relative;
     padding: 30px;
     border-radius: 20px;
 }
