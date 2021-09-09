@@ -3,8 +3,12 @@
 
 {% block head %}
 <script src="{% static 'login/react/tabela-carregando.js' %}" type="text/babel"></script>
-<script src="{% static 'login/js/gerenciar-usuarios.js' %}" type="text/babel"></script>
 <link rel="stylesheet" href="{% static 'login/css/requisicoes.css' %}"></link>
+<script>var exports = {};</script>
+<script src="https://unpkg.com/react-table@7.5.0/dist/react-table.production.min.js" type="text/babel"  ></script>
+<script src="{% static 'login/react/columns.js' %}"></script>
+<script src="{% static 'login/react/MOCK_DATA (1).js' %}"></script>
+<script src="{% static 'login/react/react-table.js' %}" type="text/babel"></script>
 
 {% endblock %}
 
