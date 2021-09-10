@@ -2,3 +2,5 @@
 .TCC/.vscode/
 .TCC/db.sqlite3
 .db.sqlite3
+.TCC/login/_pycache_
+.TCC/_pycache_
