@@ -209,6 +209,11 @@ def get_usuarios(request):
             .order_by_key().limit_to_first(10).get().val()
         dataJSON = json.dumps(usuarios)
         return JsonResponse(dataJSON, safe=False)
+
+def usuario_view(request, uid):
+    usuario = dbRealtime.child(f"dados/usuarios/{uid}").get().val()
+    return render(request, "login/usuario.html", {"title": usuario["nome"], "usuario": usuario})
+    
     
     
     

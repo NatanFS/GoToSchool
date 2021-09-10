@@ -1,0 +1,52 @@
+{% extends 'login/layout.html' %}
+{% load static %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="row container-fluid">
+    <div class="col d-flex justify-content-center">
+        <img src="{{usuario.urlFoto}}" class=" foto-usuario" height="150px" width="150px">
+    </div>
+
+    <form method="POST" class="col-10">
+        <div class="form-group">
+            <label for="nome" class="form-label">Nome do usuário</label>
+            <input type="text" class="form-control" name="nome" value="{{usuario.nome}}">
+        </div>
+        <div class="form-group">
+            <label for="cpf" class="form-label">CPF</label>
+            <input type="text" class="form-control" name="cpf" value="{{usuario.cpf}}">
+        </div>
+        <div class="form-group">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="text" class="form-control" name="email" value="{{usuario.email}}">
+        </div>
+        <div class="form-group">
+            <label for="turno" class="form-label">Turno</label>
+            <select id="turno" class="form-select">
+                <option>matutino</option>
+                <option>vespertino</option>
+                <option>noturno</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="selectAtivo" class="form-label">Status</label>
+            <select id="selectAtivo" class="form-select">
+                <option>Habilitado</option>
+                <option>Desabilitado</option>
+            </select>
+        </div>
+        <div class="row ">
+            <div class="col d-flex justify-content-end p-3">
+                <button type="submit" class="btn btn-primary">Salvar alterações</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+

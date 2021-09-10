@@ -67,6 +67,7 @@ export const Table = () => {
                     prepareRow(row)
                     return (<tr {...row.getRowProps()}>
                         {row.cells.map(cell => {
+                            console.log(cell)
                             if (cell.column.id == "urlFoto") {
                                 return <td {...cell.getCellProps()}>
                                     <img src={cell.value} class="foto-usuario" />
