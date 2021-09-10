@@ -1,3 +1,4 @@
+.vscode
 .TCC/.vscode/
 .TCC/db.sqlite3
 .db.sqlite3
