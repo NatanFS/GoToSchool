@@ -9,10 +9,10 @@ const COLUMNS = [
     },
     {
         Header: 'CPF',
-        accessor: 'email',
+        accessor: 'CPF',
     },
     {
         Header: 'E-mail',
-        accessor: 'country',
+        accessor: 'email',
     },
 ]
