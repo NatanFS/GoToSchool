@@ -1,5 +1,10 @@
+html, body{
+    overflow-y: visible;
+}
+
 .foto-usuario{
     border-radius: 75px;
+    object-fit: cover;
 }
 
 .container-usuario{

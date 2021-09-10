@@ -209,22 +209,22 @@ h2{
 }
 
 /* width */
-::-webkit-scrollbar {
+.sidebar ::-webkit-scrollbar {
     width: 3px;
     transform: translateX(-50%);
   }
   
-  /* Track */
-  ::-webkit-scrollbar-track {
+   /* Track */
+   .sidebar ::-webkit-scrollbar-track {
     background: rgb(7, 7, 70); 
   }
    
   /* Handle */
-  ::-webkit-scrollbar-thumb {
+  .sidebar ::-webkit-scrollbar-thumb {
     background: rgb(7, 7, 70); 
   }
   
   /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
+  .sidebar ::-webkit-scrollbar-thumb:hover {
     background: rgb(20, 20, 197); 
   }
