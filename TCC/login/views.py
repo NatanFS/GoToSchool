@@ -202,4 +202,13 @@ class CadastrarStaff(CreateView):
 def usuarios_view(request):
     if request.method == "GET":
         return render(request, "login/usuarios.html" , {'title': "Gerenciar usuários"})
+
+def get_usuarios(request):
+    if(request.method == "GET"):
+        usuarios = dbRealtime.child("dados/usuarios")\
+            .order_by_key().limit_to_first(10).get().val()
+        dataJSON = json.dumps(usuarios)
+        return JsonResponse(dataJSON, safe=False)
+    
+    
     
