@@ -19,4 +19,8 @@ const COLUMNS = [
         Header: 'E-mail',
         accessor: 'email',
     },
+    {
+        Header: '',
+        accessor: 'ver',
+    },
 ]

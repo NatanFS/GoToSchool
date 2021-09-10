@@ -44,14 +44,20 @@ export const Table = () => {
             <td role="cell"> </td>
             <td role="cell"> </td>
             <td role="cell"> </td>
+            <td role="cell"> </td>
         </tr>)
+    }
+
+    function goToUser(row){
+        var uid = row.original.idUsuario
+        window.location.pathname =(`usuario/${uid}`) 
     }
 
     return (<>
         <table {...getTableProps()} class="table table-light table-striped table-hover align-middle">
             <thead>
                 {headerGroups.map((headerGroup) => (
-                    <tr {...headerGroup.getHeaderGroupProps()}>
+                    <tr {...headerGroup.getHeaderGroupProps()} >
                         {console.log(headerGroup)}
                         {headerGroup.headers.map((column) => {
                             return <th {...column.getHeaderProps()}>
@@ -66,11 +72,17 @@ export const Table = () => {
                 {rows.map(row => {
                     prepareRow(row)
                     return (<tr {...row.getRowProps()}>
+                    
                         {row.cells.map(cell => {
-                            console.log(cell)
+                            console.log(row)
                             if (cell.column.id == "urlFoto") {
                                 return <td {...cell.getCellProps()}>
                                     <img src={cell.value} class="foto-usuario" />
+                                </td>
+                            }
+                            if (cell.column.id == "ver") {
+                                return <td {...cell.getCellProps()}>
+                                    <button onClick={() => goToUser(row)}> Ver </button>
                                 </td>
                             }
                             return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>

@@ -2,14 +2,15 @@
 {% load static %}
 
 {% block head %}
+<link rel="stylesheet" href="{% static 'login/css/usuario.css'%}">
 
 {% endblock %}
 
 {% block body %}
 
-<div class="row container-fluid">
+<div class="row container-fluid container-usuario">
     <div class="col d-flex justify-content-center">
-        <img src="{{usuario.urlFoto}}" class=" foto-usuario" height="150px" width="150px">
+        <img src="{{usuario.urlFoto}}" class="foto-usuario" height="150px" width="150px">
     </div>
 
     <form method="POST" class="col-10">
@@ -46,6 +47,14 @@
             </div>
         </div>
     </form>
+</div>
+
+<div class="row container-fluid container-pdf">
+    <div class="col-12 matricula-header">
+        <h3 >Matrícula</h3>
+        <hr>
+    </div>
+    <embed src="{{usuario.urlPDF}}" type="application/pdf" height="100%" width="100%" class="pdf">
 </div>
 
 {% endblock %}
