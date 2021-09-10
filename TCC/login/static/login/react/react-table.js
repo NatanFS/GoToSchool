@@ -13,19 +13,24 @@ export const Table = () => {
          headerGroups,
          rows,
          prepareRow} = tableInstance
+        
+         console.log(headerGroups)
 
     return (<table {...getTableProps()} class="table table-light table-striped table-hover align-middle">
-                <thead >
-                {headerGroups.map(headerGroup => () => {
+                <thead>
+                {headerGroups.map((headerGroup) => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map( (column) => {
-                        <th {...column.getHeaderProps()}>
-                            {column.render('Header')}
+                    {console.log(headerGroup)}
+                    {headerGroup.headers.map((column) => {
+                        
+                        return <th {...column.getHeaderProps()}>
+                        {console.log(column)}
+                            {column.render("Header")}
                         </th>
-                    } )}
+                    })}
                     </tr>
-                })}
-                    
+                ))} 
+             
                 </thead>
                 <tbody {...getTableBodyProps()}>
                     {rows.map(row => {
@@ -33,6 +38,7 @@ export const Table = () => {
                         return(
                             <tr {...row.getRowProps()}>
                             {row.cells.map(cell => {
+                                console.log(row)
                                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                             })}
                                 
