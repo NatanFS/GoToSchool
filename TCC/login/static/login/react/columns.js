@@ -1,15 +1,19 @@
 const COLUMNS = [
     {
-        Header: 'id',
-        accessor: 'id',
+        Header: 'Foto',
+        accessor: 'urlFoto',
     },
     {
         Header: 'Nome',
-        accessor: 'first_name',
+        accessor: 'nome',
+    },
+    {
+        Header: 'Turno',
+        accessor: 'turno',
     },
     {
         Header: 'CPF',
-        accessor: 'CPF',
+        accessor: 'cpf',
     },
     {
         Header: 'E-mail',
