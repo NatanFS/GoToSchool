@@ -97,14 +97,14 @@
                 <span class="links_name">Ouvidoria</span>
               </a>
             </li>
-         {#% if user.is_superuser %#}
+         {% if user.is_superuser %}
             <li>
               <a class="nav-link" href="{% url 'cadastrar-staff' %}">
                 <i class='bx bxs-user-plus' ></i>
                 <span class="links_name">Administradores</span>
               </a>
             </li>
-         {#% endif %#}
+         {% endif %}
             <div class="log-out">
               <li>
                 <a class="nav-link" href="{% url 'logout' %}">

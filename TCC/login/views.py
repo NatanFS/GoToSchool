@@ -14,6 +14,10 @@ from pyfcm import FCMNotification
 from django.views.generic import CreateView
 from google.cloud.firestore_v1 import Increment
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
+from .mixin import SuperuserRequiredMixin
+
+
 
 credentials_google = {
     "type": "service_account",
@@ -54,7 +58,7 @@ def login_view(request):
     else:
         return render(request, 'login/login.html')
 
-
+@login_required
 def index(request):
     user = request.user
     if user.is_anonymous:
@@ -70,6 +74,7 @@ def logout_view(request):
 def requisicoes_view(request):
     return render(request, "login/requisicoes.html", {"title": "Responder requisições"})
 
+@login_required
 @csrf_exempt
 def getReqData(request):
     #Index indicará a página selecionada
@@ -114,6 +119,7 @@ def getReqData(request):
     dataJSON = json.dumps(data)
     return JsonResponse(dataJSON, safe=False)
 
+@login_required
 @csrf_exempt
 def answerReq(request):
     if request.method != "POST":
@@ -182,8 +188,9 @@ def reservarVaga(data):
     nVagasOcupadas = nextIndexPassageiro + 1
     dbRealtime.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/listaPassageiros/{nextIndexPassageiro}").set(userId)
     dbRealtime.child(f"dados/dias/{onibusData}/turnos/{onibusTurno}/onibusLista/{onibusNome}/vagasOcupadas").set(nVagasOcupadas)
-    
-class CadastrarStaff(CreateView):
+
+
+class CadastrarStaff(SuperuserRequiredMixin, CreateView):
     model = User
     form_class = CadastrarStaffForm
     template_name = 'login/cadastro-staff.html'
@@ -199,21 +206,48 @@ class CadastrarStaff(CreateView):
         messages.success(self.request, "Usuário administrador adicionado com sucesso!")
         return super().form_valid(form)
     
+@login_required    
 def usuarios_view(request):
     if request.method == "GET":
         return render(request, "login/usuarios.html" , {'title': "Gerenciar usuários"})
 
+@login_required
 def get_usuarios(request):
     if(request.method == "GET"):
         usuarios = dbRealtime.child("dados/usuarios")\
             .order_by_key().limit_to_first(10).get().val()
         dataJSON = json.dumps(usuarios)
         return JsonResponse(dataJSON, safe=False)
+    
+@login_required
+def usuario_view(request):
+    if request.method == "POST":
+        nome = request.POST["nome"]
+        cpf = request.POST["cpf"]
+        email = request.POST["email"]
+        uid = request.POST["uid"]
+        dbRealtime.child(f"dados/usuarios/{uid}/nome").set(nome)
+        dbRealtime.child(f"dados/usuarios/{uid}/cpf").set(cpf)
+        dbRealtime.child(f"dados/usuarios/{uid}/email").set(email)
 
-def usuario_view(request, uid):
     usuario = dbRealtime.child(f"dados/usuarios/{uid}").get().val()
     return render(request, "login/usuario.html", {"title": usuario["nome"], "usuario": usuario})
-    
+
+@csrf_exempt
+def editar_usuario(request):
+    if request.method == "POST":
+        nome = request.POST["nome"]
+        cpf = request.POST["cpf"]
+        email = request.POST["email"]
+        turno = request.POST["turno"]
+        status = request.POST["status"]
+        uid = request.POST["uid"]
+        dbRealtime.child(f"dados/usuarios/{uid}/nome").update(nome)
+        dbRealtime.child(f"dados/usuarios/{uid}/cpf").update(cpf)
+        dbRealtime.child(f"dados/usuarios/{uid}/email").update(email)
+        dbRealtime.child(f"dados/usuarios/{uid}/turno").update(turno)
+        dbRealtime.child(f"dados/usuarios/{uid}/status").update(status)
+        return JsonResponse({"message": "Dados alterados com sucesso."}, status=201)
     
     
     

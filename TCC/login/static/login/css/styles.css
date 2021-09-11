@@ -208,14 +208,14 @@ h2{
     left: 240px;
 }
 
-/* width */
-.sidebar ::-webkit-scrollbar {
+  /* width */
+  .sidebar ::-webkit-scrollbar {
     width: 3px;
     transform: translateX(-50%);
   }
   
-   /* Track */
-   .sidebar ::-webkit-scrollbar-track {
+  /* Track */
+  .sidebar ::-webkit-scrollbar-track {
     background: rgb(7, 7, 70); 
   }
    
