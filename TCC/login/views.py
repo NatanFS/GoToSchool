@@ -251,4 +251,27 @@ def usuario_view(request, uid):
     return render(request, "login/usuario.html", context)
     
     
+@login_required    
+def avisos_view(request):
+    if request.method == "GET":
+        return render(request, "login/avisos.html" , {'title': "Gerenciar avisos"})
     
+@login_required    
+def motoristas_view(request):
+    if request.method == "GET":
+        return render(request, "login/motoristas.html" , {'title': "Gerenciar motoristas"})
+
+@login_required    
+def novidades_view(request):
+    if request.method == "GET":
+        return render(request, "login/novidades.html" , {'title': "Gerenciar novidades"})
+    
+@login_required    
+def ouvidoria_view(request):
+    if request.method == "GET":
+        return render(request, "login/ouvidoria.html" , {'title': "Ouvidoria"})
+
+@login_required    
+def onibus_view(request):
+    if request.method == "GET":
+        return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus"})

@@ -33,4 +33,15 @@ class DadosUsuarioForm(forms.Form):
         self.fields['cpf'].widget.attrs.update({ 'class':('form-control mask-cpf'), })
         self.fields['turno'].widget.attrs.update({ 'class':('form-select')})        
         self.fields['status'].widget.attrs.update({'class':('form-select')})
-    
+
+class MotoristaForm(forms.Form):
+    pass
+
+class NovidadeForm(forms.Form):
+    pass
+
+class OnibusForm(forms.Form):
+    pass
+
+class AvisoForm(forms.Form):
+    pass
