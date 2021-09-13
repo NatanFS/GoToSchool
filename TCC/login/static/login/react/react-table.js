@@ -82,7 +82,7 @@ export const Table = () => {
                             }
                             if (cell.column.id == "ver") {
                                 return <td {...cell.getCellProps()}>
-                                    <button onClick={() => goToUser(row)}> Ver </button>
+                                    <button class="btn btn-primary btn-ver" onClick={() => goToUser(row)}> Ver </button>
                                 </td>
                             }
                             return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>

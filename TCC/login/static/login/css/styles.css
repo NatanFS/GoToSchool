@@ -228,3 +228,15 @@ h2{
   .sidebar ::-webkit-scrollbar-thumb:hover {
     background: rgb(20, 20, 197); 
   }
+
+.btn-primary {
+    color: #fff;
+    background-color: rgb(7, 7, 70);
+    border-color: rgb(7, 7, 70); 
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #3066BE;
+    border-color: #3066BE;
+}
