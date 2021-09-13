@@ -6,7 +6,7 @@ ReactDOM.render(<TableCarregando/>,
     
 //Faz a requisição dos dados para o servidor
 function recuperarPrimeirasRequisicoes(){
-    fetch('requisicoes/api')
+    fetch('API/requisicoes')
     .then(response => response.json())
     .then(response => {
         var response = JSON.parse(response)

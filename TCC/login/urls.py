@@ -10,9 +10,8 @@ urlpatterns = [
     path('usuarios', views.usuarios_view, name=("usuarios")),
     path('API/usuarios', views.get_usuarios, name=("getUsuarios")),
     path('usuario/<str:uid>', views.usuario_view, name=("usuario")),
-    path('usuario/editar>', views.editar_usuario, name=("editar-usuario")),
     path("cadastro-staff", views.CadastrarStaff.as_view(), name=("cadastrar-staff")),
     path('requisicoes', views.requisicoes_view, name=('requisicoes')),
-    path('requisicoes/api', views.getReqData, name=('reqData')),
+    path('API/requisicoes', views.getReqData, name=('reqData')),
     path('requisicoes/answer', views.answerReq, name=("answerReq")),
 ]

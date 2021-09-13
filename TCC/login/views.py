@@ -1,3 +1,4 @@
+from login.forms import DadosUsuarioForm
 from login.models import User
 from login.forms import CadastrarStaffForm
 from django.http.response import HttpResponseRedirect, JsonResponse
@@ -220,34 +221,34 @@ def get_usuarios(request):
         return JsonResponse(dataJSON, safe=False)
     
 @login_required
-def usuario_view(request):
+def usuario_view(request, uid):
     if request.method == "POST":
-        nome = request.POST["nome"]
-        cpf = request.POST["cpf"]
-        email = request.POST["email"]
-        uid = request.POST["uid"]
-        dbRealtime.child(f"dados/usuarios/{uid}/nome").set(nome)
-        dbRealtime.child(f"dados/usuarios/{uid}/cpf").set(cpf)
-        dbRealtime.child(f"dados/usuarios/{uid}/email").set(email)
-
+        form = DadosUsuarioForm(request.POST)
+        print(form.errors)
+        if form.is_valid(): 
+            nome = form.cleaned_data["nome"]
+            cpf =  form.cleaned_data["cpf"]
+            email =  form.cleaned_data["email"]
+            turno =  form.cleaned_data["turno"]
+            status =  form.cleaned_data["status"]
+            dbRealtime.child(f"dados/usuarios/{uid}/nome").set(nome)
+            dbRealtime.child(f"dados/usuarios/{uid}/cpf").set(cpf)
+            dbRealtime.child(f"dados/usuarios/{uid}/email").set(email)
+            dbRealtime.child(f"dados/usuarios/{uid}/status").set(status)
+            dbRealtime.child(f"dados/usuarios/{uid}/turno").set(turno)
+        else:
+            messages.error(request, form.errors)
+    else:
+        form = DadosUsuarioForm()
     usuario = dbRealtime.child(f"dados/usuarios/{uid}").get().val()
-    return render(request, "login/usuario.html", {"title": usuario["nome"], "usuario": usuario})
-
-@csrf_exempt
-def editar_usuario(request):
-    if request.method == "POST":
-        nome = request.POST["nome"]
-        cpf = request.POST["cpf"]
-        email = request.POST["email"]
-        turno = request.POST["turno"]
-        status = request.POST["status"]
-        uid = request.POST["uid"]
-        dbRealtime.child(f"dados/usuarios/{uid}/nome").update(nome)
-        dbRealtime.child(f"dados/usuarios/{uid}/cpf").update(cpf)
-        dbRealtime.child(f"dados/usuarios/{uid}/email").update(email)
-        dbRealtime.child(f"dados/usuarios/{uid}/turno").update(turno)
-        dbRealtime.child(f"dados/usuarios/{uid}/status").update(status)
-        return JsonResponse({"message": "Dados alterados com sucesso."}, status=201)
+    form.fields['nome'].initial = usuario["nome"]
+    form.fields['cpf'].initial = usuario["cpf"]
+    form.fields['email'].initial = usuario["email"]
+    form.fields['turno'].initial = usuario["turno"]
+    form.fields['status'].initial = usuario["status"]
+    
+    context = {"title": usuario["nome"], "fotoURL": usuario["urlFoto"], "urlPDF": usuario["urlPDF"], "form": form}
+    return render(request, "login/usuario.html", context)
     
     
     

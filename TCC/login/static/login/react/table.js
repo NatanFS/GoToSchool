@@ -186,7 +186,7 @@ function Table(props) {
         
         return new Promise((resolve, reject) => {
             console.log("RECUPERAR NOVAS REQS")
-            fetch(`requisicoes/api`, {
+            fetch(`API/requisicoes`, {
                 method: 'POST',
                 body: JSON.stringify(
                     {

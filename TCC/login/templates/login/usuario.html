@@ -3,48 +3,33 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'login/css/usuario.css'%}">
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
 {% endblock %}
 
 {% block body %}
 
 <div class="row container-fluid container-usuario">
     <div class="col d-flex justify-content-center">
-        <img src="{{usuario.urlFoto}}" class="foto-usuario" height="150px" width="150px">
+        <img src="{{fotoURL}}" class="foto-usuario" height="150px" width="150px">
     </div>
+
+    
 
     <form method="POST" class="col-10" id="editar-dados-usuario">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="nome" class="form-label">Nome do usuário</label>
-            <input type="text" class="form-control" name="nome" value="{{usuario.nome}}">
-        </div>
-        <div class="form-group">
-            <label for="cpf" class="form-label">CPF</label>
-            <input type="text" class="form-control" name="cpf" value="{{usuario.cpf}}">
-        </div>
-        <div class="form-group">
-            <label for="email" class="form-label">E-mail</label>
-            <input type="text" class="form-control" name="email" value="{{usuario.email}}">
-        </div>
-        <div class="form-group">
-            <label for="turno" class="form-label">Turno</label>
-            <select id="turno" class="form-select">
-                <option>matutino</option>
-                <option>vespertino</option>
-                <option>noturno</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="selectAtivo" class="form-label">Status</label>
-            <select id="selectAtivo" class="form-select">
-                <option>Habilitado</option>
-                <option>Desabilitado</option>
-            </select>
-        </div>
-        <div class="form-group" style="display: none;">
-            <input type="text" class="form-control" name="uid" value="{{usuario.idUsuario}}" readonly>
-        </div>
+        {% for field in form %}
+        
+            {% for error in field.errors %}
+            <div class="error-messages text-danger">
+                {{ error }}
+            </div> 
+            {%endfor%}
+            <div class="form-group">
+                {{field.label_tag}}
+                {{field}}
+            </div>
+        {% endfor %}
         <div class="row ">
             <div class="col d-flex justify-content-end p-3">
                 <button type="submit" class="btn btn-primary">Salvar alterações</button>
@@ -58,18 +43,14 @@
         <h3>Matrícula</h3>
         <hr>
     </div>
-    <embed src="{{usuario.urlPDF}}" type="application/pdf" height="100%" width="100%" class="pdf">
+    <embed src="{{urlPDF}}" type="application/pdf" height="100%" width="100%" class="pdf">
 </div>
 
+<script>
+    $('.mask-cpf').mask('000.000.000-00', {reverse: true}) 
+</script>
 {% if not user.is_superuser %}
-    <script>
-        var form = document.getElementById('editar-dados-usuario')
-        console.log(form)
-        var elements = form.elements
-        for(let i = 0; i < elements.length; i++){
-            elements[i].disabled = "true"
-        }
-    </script>
+    <script src="{% static 'login/js/usuarios-superuser.js'%}"></script>
 {% endif %}
 
 {% endblock %}
