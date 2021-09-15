@@ -53,21 +53,15 @@ class MotoristaForm(forms.Form):
 
 class NovidadeForm(forms.Form):
     conteudo = forms.CharField(max_length=100, label="Conteúdo")
-    título = forms.CharField(max_length=100, label="Título")
-    timeInMilis = forms.TimeField( )
+    titulo = forms.CharField(max_length=100, label="Título")
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['conteudo'].widget.attrs.update({'class':('form-control')})
-        self.fields['titulo'].widget.attrs.update({ 'class':('form-control'), })
-        self.fields['timeInMilis'].widget.attrs.update({ 'class':('hidden'), })    
+        self.fields['titulo'].widget.attrs.update({ 'class':('form-control'), })   
 
 class OnibusForm(forms.Form):
     nome = forms.CharField(max_length=100, label="Nome do ônibus")
     placa = forms.CharField(max_length=8, min_length=8, label="Placa")
-    horarioIdaSaida = forms.CharField(max_length=100, label="Horário de saída da ida")
-    horarioIdaChegada = forms.CharField(max_length=100, label="Horário de chegada da ida")
-    horarioVoltaSaida = forms.CharField(max_length=100, label="Horário de saída do retorno")
-    horarioVoltaChegada = forms.CharField(max_length=100, label="Horário de chegada do retorno")
     turno = forms.ChoiceField(choices=CHOICES_TURNO, label="Turno")
     capacidade = forms.IntegerField(max_value=150)
     
@@ -75,10 +69,6 @@ class OnibusForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['nome'].widget.attrs.update({'class':('form-control')})
         self.fields['placa'].widget.attrs.update({ 'class':('form-control'), })
-        self.fields['horarioIdaSaida'].widget.attrs.update({ 'class':('form-control'), })
-        self.fields['horarioIdaChegada'].widget.attrs.update({ 'class':('form-control'), })
-        self.fields['horarioVoltaSaida'].widget.attrs.update({ 'class':('form-control'), })
-        self.fields['horarioVoltaChegada'].widget.attrs.update({ 'class':('form-control'), })
         self.fields['turno'].widget.attrs.update({ 'class':('form-control'), })
         self.fields['capacidade'].widget.attrs.update({ 'class':('form-control'), })  
         

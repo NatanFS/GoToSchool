@@ -4,7 +4,63 @@
 
 {% endblock %}
 
+<link rel="stylesheet" href="">
 {% block body %}
+
+<form method="POST" class="col-xs-12 col-sm-8 col-md-10" id="editar-dados-usuario">
+    {% csrf_token %}
+    {% for field in form %}
+    
+        {% for error in field.errors %}
+        <div class="error-messages text-danger">
+            {{ error }}
+        </div> 
+        {%endfor%}
+        <div class="form-group">
+            {{field.label_tag}}
+            {{field}}
+        </div>
+    {% endfor %}
+
+    <label for="horarioIdaSaida"> Horário de saída do ônibus  (Viagem de ida)</label>
+    <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
+        <input type="text" class="form-control" name="horarioIdaSaida" value="18:00">
+        <span class="input-group-addon">
+            <span class="glyphicon glyphicon-time"></span>
+        </span>
+    </div>
+    <label for="horarioIdaChegada"> Horário de chegada ônibus (Viagem de ida) </label>
+    <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
+        <input type="text" class="form-control" name="horarioIdaChegada" value="18:00">
+        <span class="input-group-addon">
+            <span class="glyphicon glyphicon-time"></span>
+        </span>
+    </div>
+    <label for="horarioVoltaSaida"> Horário de saída do ônibus (Retorno)</label>
+    <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
+        <input type="text" class="form-control" name="horarioVoltaSaida" value="18:00">
+        <span class="input-group-addon">
+            <span class="glyphicon glyphicon-time"></span>
+        </span>
+    </div>
+    <label for="horarioVoltaChegada"> Horário de chegada ônibus (Retorno)</label>
+    <div class="input-group clockpicker" data-placement="top" data-align="left" data-autoclose="true">
+        <input type="text" class="form-control" name="horarioVoltaChegada" value="18:00">
+        <span class="input-group-addon">
+            <span class="glyphicon glyphicon-time"></span>
+        </span>
+    </div>
+
+    <div class="row ">
+        <div class="col d-flex justify-content-end p-3">
+            <button type="submit" class="btn btn-primary">Adicionar</button>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    $('.clockpicker').clockpicker();
+    </script>
 
 
 {% endblock %}

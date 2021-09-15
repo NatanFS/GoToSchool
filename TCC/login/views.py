@@ -281,12 +281,14 @@ def avisos_view(request):
 @login_required    
 def motoristas_view(request):
     if request.method == "GET":
-        return render(request, "login/motoristas.html" , {'title': "Gerenciar motoristas"})
+        form = MotoristaForm()
+        return render(request, "login/motoristas.html" , {'title': "Gerenciar motoristas",  "form": form})
 
 @login_required    
 def novidades_view(request):
     if request.method == "GET":
-        return render(request, "login/novidades.html" , {'title': "Gerenciar novidades"})
+        form = NovidadeForm()
+        return render(request, "login/novidades.html" , {'title': "Gerenciar novidades",  "form": form})
     
 @login_required    
 def ouvidoria_view(request):
@@ -296,4 +298,5 @@ def ouvidoria_view(request):
 @login_required    
 def onibus_view(request):
     if request.method == "GET":
-        return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus"})
+        form = OnibusForm()
+        return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form})
