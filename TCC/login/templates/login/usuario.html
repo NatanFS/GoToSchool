@@ -10,13 +10,15 @@
 {% block body %}
 
 <div class="row container-fluid container-usuario">
-    <div class="col d-flex justify-content-center">
-        <img src="{{fotoURL}}" class="foto-usuario" height="150px" width="150px">
-    </div>
+   
+        <div class="col-xs-12 col-sm-4 col-md-2 container-usuario-foto">
+            <img src="{{fotoURL}}" class="foto-usuario" height="150px" width="150px">
+        </div>
+    
 
     
 
-    <form method="POST" class="col-10" id="editar-dados-usuario">
+    <form method="POST" class="col-xs-12 col-sm-8 col-md-10" id="editar-dados-usuario">
         {% csrf_token %}
         {% for field in form %}
         
@@ -38,16 +40,28 @@
     </form>
 </div>
 
-<div class="row container-fluid container-pdf">
+<div class="row container-fluid container-matricula">
     <div class="col-12 matricula-header">
-        <h3>Matrícula</h3>
-        <hr>
+        <h3 style="vertical-align: middle;">
+            <i id="icon-show" class="fas fa-chevron-right" style="font-size: 16px ; margin-left: 5px; color: gray; vertical-align: middle;"></i>
+            Matrícula</h3>
+            <hr>
     </div>
-    <embed src="{{urlPDF}}" type="application/pdf" height="100%" width="100%" class="pdf">
+    <div class="container-pdf">
+        <embed src="{{urlPDF}}" type="application/pdf" height="100%" width="100%" class="pdf">
+    </div>
 </div>
 
 <script>
-    $('.mask-cpf').mask('000.000.000-00', {reverse: true}) 
+    $('.mask-cpf').mask('000.000.000-00', {reverse: true})
+    $('.matricula-header').on('click', function(){
+        var matricula = $('.container-pdf')
+        matricula.toggleClass('active')
+        $('.container-matricula').toggleClass('active')
+        $('#icon-show').toggleClass("fas fa-chevron-right")
+        $('#icon-show').toggleClass("fas fa-chevron-down")
+
+    }) 
 </script>
 {% if not user.is_superuser %}
     <script src="{% static 'login/js/usuarios-superuser.js'%}"></script>

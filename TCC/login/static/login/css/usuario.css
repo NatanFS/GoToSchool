@@ -15,7 +15,11 @@ label{
     font-weight: bold;
 }
 
-.container-pdf{
+.container-matricula {
+    height: auto;
+}
+
+.container-matricula.active{
     height: 100%;
 }
 
@@ -24,3 +28,23 @@ label{
     margin: 0px 0px 16px 0px;
 
 }
+
+.container-usuario-foto{
+    text-align: center;
+}
+
+.container-pdf{
+    display: none;
+    height: 0%;
+    transition: 0.3s;  
+}
+
+.container-pdf.active{
+    height: 100%;
+    display: block;
+}
+
+.container-pdf.active ~ .container-matricula{
+    height: 0px;
+}
+

@@ -1,6 +1,5 @@
-from login.forms import DadosUsuarioForm
-from login.models import User
-from login.forms import CadastrarStaffForm
+from time import time
+from login.forms import *
 from django.http.response import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 import firebase_admin
@@ -17,8 +16,12 @@ from google.cloud.firestore_v1 import Increment
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from .mixin import SuperuserRequiredMixin
+from .util import PushID
+import re
 
 
+
+print()
 
 credentials_google = {
     "type": "service_account",
@@ -225,7 +228,7 @@ def usuario_view(request, uid):
     if request.method == "POST":
         form = DadosUsuarioForm(request.POST)
         print(form.errors)
-        if form.is_valid(): 
+        if form.is_valid() and request.user.is_superuser: 
             nome = form.cleaned_data["nome"]
             cpf =  form.cleaned_data["cpf"]
             email =  form.cleaned_data["email"]
@@ -247,14 +250,33 @@ def usuario_view(request, uid):
     form.fields['turno'].initial = usuario["turno"]
     form.fields['status'].initial = usuario["status"]
     
-    context = {"title": usuario["nome"], "fotoURL": usuario["urlFoto"], "urlPDF": usuario["urlPDF"], "form": form}
+    context = {"title": usuario['nome'], "fotoURL": usuario["urlFoto"], "urlPDF": usuario["urlPDF"],  "nome": usuario["nome"], "form": form}
     return render(request, "login/usuario.html", context)
     
     
 @login_required    
 def avisos_view(request):
-    if request.method == "GET":
-        return render(request, "login/avisos.html" , {'title': "Gerenciar avisos"})
+    if request.method == "POST":
+        form = AvisoForm(request.POST)
+        print(form.errors)
+        if form.is_valid():
+            data = form.cleaned_data
+            aviso_id = PushID().next_id()
+            # aviso_id_clean = aviso_id.replace("_", "")
+            
+            aviso = {
+                "data": datetime.today().strftime('%d/%m/%Y') ,
+                "idAviso": aviso_id,
+                "idUsuario": "GoToSchool",
+                "texto": data['texto'],
+                "timeinmilis": time(),
+                "quantidadeComentarios": 0,
+            }
+
+            dbRealtime.child(f"dados/avisos/{aviso_id}").set(aviso)
+            return render(request, "login/avisos.html" , {'title': "Gerenciar avisos", "form": form}) 
+    form = AvisoForm()
+    return render(request, "login/avisos.html" , {'title': "Gerenciar avisos", "form": form})    
     
 @login_required    
 def motoristas_view(request):
