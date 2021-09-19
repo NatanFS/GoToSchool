@@ -2,6 +2,7 @@ import pyrebase
 import random
 import time
 import numpy
+import datetime
 
 def initialize_firebase():
     credentials_google = {
@@ -96,3 +97,9 @@ class PushID(object):
         if len(uid) != 20:
             raise ValueError('Length should be 20.')
         return uid
+    
+def time_until_end_of_day(dt=None):
+    if dt is None:
+        dt = datetime.datetime.now()
+    return 3
+    #return ((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)

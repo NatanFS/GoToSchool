@@ -1,9 +1,10 @@
+import threading
 from time import time
 from login.forms import *
 from django.http.response import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 import firebase_admin
-from .util import initialize_firebase, recuperarOnibus
+from .util import initialize_firebase, recuperarOnibus, time_until_end_of_day
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -17,7 +18,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from .mixin import SuperuserRequiredMixin
 from .util import PushID
+import locale
+from datetime import datetime
+from datetime import timedelta
 import re
+from threading import Thread
 
 
 
@@ -43,6 +48,16 @@ dbRealtime = firebase.database()
 dbFirestore = firestore.client()
 collection = dbFirestore.collection('dados')
 doc = collection.document('requisicoesDados')
+
+# def timer():
+#     threading.Timer(time_until_end_of_day(), oi).start()
+
+# def oi():
+#     print("oi")
+#     timer()
+    
+# timer()    
+
 
 
 # Create your views here.
@@ -286,9 +301,21 @@ def motoristas_view(request):
 
 @login_required    
 def novidades_view(request):
-    if request.method == "GET":
-        form = NovidadeForm()
-        return render(request, "login/novidades.html" , {'title': "Gerenciar novidades",  "form": form})
+    if request.method == "POST":
+        form = NovidadeForm(request.POST)
+        if form.is_valid():
+            novidade_id = PushID().next_id()
+            data = form.cleaned_data
+            novidade = {
+                "titulo": data["titulo"] + f" {datetime.today().strftime('%d/%m/%Y')}",
+                "conteudo": data["conteudo"],
+                "timeInMilis": time(),
+            }
+            
+            dbRealtime.child(f"dados/novidades/{novidade_id}").set(novidade)
+            
+    form = NovidadeForm()
+    return render(request, "login/novidades.html" , {'title': "Gerenciar novidades",  "form": form})
     
 @login_required    
 def ouvidoria_view(request):
@@ -297,6 +324,35 @@ def ouvidoria_view(request):
 
 @login_required    
 def onibus_view(request):
-    if request.method == "GET":
-        form = OnibusForm()
-        return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form})
+    if request.method == "POST":
+        form = OnibusForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            onibus = {
+                "nome": data["nome"],
+                "placa": data["placa"],
+                "turnoPadrao": data["turno"],
+                "vagasTotal": data["capacidade"],
+                "vagasOcupadas": 0,
+                "vagasDisponiveis": data["capacidade"],
+                "horarioIdaSaida": request.POST["horarioIdaSaida"] + " h",
+                "horarioIdaChegada": request.POST["horarioIdaChegada"] + " h",
+                "horarioVoltaSaida": request.POST["horarioVoltaSaida"] + " h",
+                "horarioVoltaChegada": request.POST["horarioVoltaChegada"] + " h",
+                "onibusTurnoID": PushID().next_id()
+            }
+            
+            # Tornar ônibus disponível para os próximos dias.
+            QUANTIDADE_DE_DIAS = 10
+            locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8' )
+            date = datetime.now() + timedelta(days=1)
+            for i in range (QUANTIDADE_DE_DIAS):
+                if date.weekday() < 5:
+                    dateText = date.strftime("%d de %B %Y")
+                    onibus["data"] = dateText
+                    dbRealtime.child(f"dados/dias/{dateText}/turnos/{onibus['turnoPadrao']}/onibusLista/{onibus['nome']}").update(onibus)
+                date += timedelta(days=1)
+            
+            dbRealtime.child(f"dados/onibuslista/{onibus['nome']}").set(onibus)
+    form = OnibusForm()
+    return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form})
