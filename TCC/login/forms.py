@@ -36,7 +36,7 @@ class DadosUsuarioForm(forms.Form):
         self.fields['status'].widget.attrs.update({'class':('form-select')})
 
 class MotoristaForm(forms.Form):
-    nome = forms.CharField(max_length=100, label="Nome do passageiro")
+    nome = forms.CharField(max_length=100, label="Nome do motorista")
     email = forms.CharField(max_length=100, label="E-mail")
     cpf = forms.CharField(max_length=14, min_length=14, label="CPF")
     turno = forms.ChoiceField(choices=CHOICES_TURNO, label="Turno")

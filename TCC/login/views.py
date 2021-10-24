@@ -49,6 +49,8 @@ dbFirestore = firestore.client()
 collection = dbFirestore.collection('dados')
 doc = collection.document('requisicoesDados')
 
+# Essa thread poderá ser usada para fazer a criação automática dos dias na parte do servidor
+
 # def timer():
 #     threading.Timer(time_until_end_of_day(), oi).start()
 
