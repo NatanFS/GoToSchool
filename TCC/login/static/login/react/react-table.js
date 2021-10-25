@@ -1,4 +1,5 @@
 const useTable = window.ReactTable.useTable
+const usePagination = window.ReactTable.usePagination
 const useState = React.useState
 const useMemo = React.useMemo
 const useEffect = React.useEffect
@@ -6,6 +7,7 @@ export const Table = () => {
     const columns = useMemo(() => COLUMNS, [])
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(false)
+    const [totalUsers, setTotalUsers] = useState(0)
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [totalPages, setTotalPages] = useState(1)
@@ -16,7 +18,9 @@ export const Table = () => {
             const res = await fetch("API/usuarios")
             const resJSON = await res.json()
             const data = JSON.parse(resJSON)
-            const dataArr = Object.values(data)
+            const dataArr = Object.values(data.usuarios)
+            const totalUsers = data.total
+            setTotalUsers(totalUsers)
             setData(dataArr)
             setLoading(false)
         }
@@ -24,18 +28,52 @@ export const Table = () => {
         fetchData()
     }, [])
 
+    useEffect(() => {
+        if(totalUsers+10 > data.length && data.length > 0){
+            
+            const fetchData = async (lastkey, oldData, currentPageIndex) => {
+                setLoading(true)
+                console.log('LastKey:' + lastKey)
+                const res = await fetch("API/usuarios", {method: 'POST', body: JSON.stringify({lastkey: lastkey})})
+                const resJSON = await res.json()
+                const data = JSON.parse(resJSON)
+                const dataArr = Object.values(data.usuarios)
+                const totalUsers = data.total
+                const newData = oldData.concat(dataArr)
+                setTotalUsers(totalUsers)
+                setData(newData)
+                setLoading(false)
+            }
+            
+            const lastKey = data.at(-1)["idUsuario"]
+            fetchData(lastKey, data, pageIndex)
+        }
+
+        
+    }, [data]) 
+
     const tableInstance = useTable({
         columns,
-        data
-    })
+        data,
+        autoResetPage: false
+    }, usePagination)
 
     const { getTableProps,
         getTableBodyProps,
         headerGroups,
-        rows,
+        page,
+        nextPage,
+        previousPage,
+        gotoPage,
+        canNextPage,
+        canPreviousPage,
+        state,
+        pageOptions,
         prepareRow } = tableInstance
 
-    var emptyRowsNumber = 10 - rows.length
+    const { pageIndex } = state
+
+    var emptyRowsNumber = 10 - page.length
     var emptyRows = []
     for (var i = 0; i < emptyRowsNumber; i++) {
         emptyRows.push(<tr role="row">
@@ -53,12 +91,27 @@ export const Table = () => {
         window.location.pathname =(`usuario/${uid}`) 
     }
 
+    async function loadUsers(lastkey){
+        const fetchData = async () => {
+            setLoading(true)
+            const res = await fetch("API/usuarios", {method: 'POST', body: JSON.stringify({lastkey: lastkey})})
+            const resJSON = await res.json()
+            const data = JSON.parse(resJSON)
+            const dataArr = Object.values(data.usuarios)
+            const totalUsers = data.total
+            const newData = dataState.concat(dataArr)
+            
+            setTotalUsers(totalUsers)
+            setData(newData)
+            setLoading(false)
+        }
+    }
+
     return (<>
         <table {...getTableProps()} class="table table-light table-striped table-hover align-middle">
             <thead>
                 {headerGroups.map((headerGroup) => (
                     <tr {...headerGroup.getHeaderGroupProps()} >
-                        {console.log(headerGroup)}
                         {headerGroup.headers.map((column) => {
                             return <th {...column.getHeaderProps()}>
                                 {column.render("Header")}
@@ -69,12 +122,11 @@ export const Table = () => {
 
             </thead>
             <tbody {...getTableBodyProps()}>
-                {rows.map(row => {
+                {page.map(row => {
                     prepareRow(row)
                     return (<tr {...row.getRowProps()}>
                     
                         {row.cells.map(cell => {
-                            console.log(row)
                             if (cell.column.id == "urlFoto") {
                                 return <td {...cell.getCellProps()}>
                                     <img src={cell.value} class="foto-usuario" />
@@ -94,11 +146,11 @@ export const Table = () => {
 
             </tbody>
         </table>
-        <button className="btn" >
+        <button className="btn" onClick={previousPage} >
             <span className="fas fa-arrow-left" ></span>
         </button>
         Usuários
-        <button className="btn" >
+        <button className="btn" onClick={nextPage} >
             <span className="fas fa-arrow-right" ></span>
         </button>
     </>

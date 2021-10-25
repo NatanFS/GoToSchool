@@ -233,12 +233,22 @@ def usuarios_view(request):
         return render(request, "login/usuarios.html" , {'title': "Gerenciar usuários"})
 
 @login_required
+@csrf_exempt
 def get_usuarios(request):
-    if(request.method == "GET"):
+    if(request.method == "POST"):
+        data = json.loads(request.body)
+        userID = data.get("lastkey", "")
         usuarios = dbRealtime.child("dados/usuarios")\
-            .order_by_key().limit_to_first(10).get().val()
-        dataJSON = json.dumps(usuarios)
-        return JsonResponse(dataJSON, safe=False)
+            .order_by_child('idUsuario').start_at(userID).limit_to_first(2).get().val()
+        # del usuarios[userID]
+    else:
+        usuarios = dbRealtime.child("dados/usuarios")\
+            .order_by_child('idUsuario').limit_to_first(1).get().val()
+            
+    total = dbFirestore.document("dados/usuarios").get().to_dict()["numero"]
+    data = {"usuarios": usuarios, "total": total}
+    dataJSON = json.dumps(data)
+    return JsonResponse(dataJSON, safe=False)
     
 @login_required
 def usuario_view(request, uid):
