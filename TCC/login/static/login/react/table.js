@@ -37,10 +37,13 @@ function Table(props) {
     rows = rowsState
 
     let init = false
+    let showed = false
     firebase.database().ref("dados/requisicoes/lista").limitToLast(1).on('child_added', (snap, prev) => {
-        if (init) {
+
+        if (init && !showed) {
             console.log("toast")
-            Toast.show("Novas requisições foram realizadas. Clique aqui para recarregar a página.", "")
+            Toast.show("Novas requisições foram realizadas. Clique aqui para recarregar a página.")
+            showed = true
         }
         init = true
     })
