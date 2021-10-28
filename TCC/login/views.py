@@ -239,11 +239,11 @@ def get_usuarios(request):
         data = json.loads(request.body)
         userID = data.get("lastkey", "")
         usuarios = dbRealtime.child("dados/usuarios")\
-            .order_by_child('idUsuario').start_at(userID).limit_to_first(2).get().val()
-        # del usuarios[userID]
+            .order_by_child('idUsuario').start_at(userID).limit_to_first(11).get().val()
+        del usuarios[userID]
     else:
         usuarios = dbRealtime.child("dados/usuarios")\
-            .order_by_child('idUsuario').limit_to_first(1).get().val()
+            .order_by_child('idUsuario').limit_to_first(10).get().val()
             
     total = dbFirestore.document("dados/usuarios").get().to_dict()["numero"]
     data = {"usuarios": usuarios, "total": total}

@@ -29,7 +29,7 @@ export const Table = () => {
     }, [])
 
     useEffect(() => {
-        if(totalUsers+10 > data.length && data.length > 0){
+        if(totalUsers > data.length && data.length > 0){
             
             const fetchData = async (lastkey, oldData, currentPageIndex) => {
                 setLoading(true)
@@ -91,19 +91,27 @@ export const Table = () => {
         window.location.pathname =(`usuario/${uid}`) 
     }
 
-    async function loadUsers(lastkey){
-        const fetchData = async () => {
-            setLoading(true)
-            const res = await fetch("API/usuarios", {method: 'POST', body: JSON.stringify({lastkey: lastkey})})
-            const resJSON = await res.json()
-            const data = JSON.parse(resJSON)
-            const dataArr = Object.values(data.usuarios)
-            const totalUsers = data.total
-            const newData = dataState.concat(dataArr)
-            
-            setTotalUsers(totalUsers)
-            setData(newData)
-            setLoading(false)
+    function showingUsersNumber() {
+        if(canNextPage){
+            return (<> {pageIndex*10} </>)
+        } else {
+            return (<> {totalUsers%10} </>)
+        }
+    }
+
+    function visibilityButtonNext(){
+        if(canNextPage){
+            return {"display":"block"}
+        } else {
+            return {"display":"none"}
+        }
+    }
+
+    function visibilityButtonPrevious(){
+        if(canPreviousPage){
+            return {"display":"block"}
+        } else {
+            return {"display":"none"}
         }
     }
 
@@ -146,13 +154,15 @@ export const Table = () => {
 
             </tbody>
         </table>
-        <button className="btn" onClick={previousPage} >
-            <span className="fas fa-arrow-left" ></span>
-        </button>
-        Usuários
-        <button className="btn" onClick={nextPage} >
-            <span className="fas fa-arrow-right" ></span>
-        </button>
+       <div style={{padding: 5 + 'px'}}>
+        <button className="btn" onClick={previousPage} style={visibilityButtonPrevious()}>
+                <span className="fas fa-arrow-left"  ></span>
+            </button>
+            Exibindo {showingUsersNumber()} de {totalUsers} Usuários
+            <button className="btn" onClick={nextPage} style={visibilityButtonNext()}>
+                <span className="fas fa-arrow-right" ></span>
+            </button>
+       </div>
     </>
 )
     
