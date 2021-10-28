@@ -39,6 +39,7 @@ function Table(props) {
     let init = false
     firebase.database().ref("dados/requisicoes/lista").limitToLast(1).on('child_added', (snap, prev) => {
         if (init) {
+            console.log("toast")
             Toast.show("Novas requisições foram realizadas. Clique aqui para recarregar a página.", "")
         }
         init = true
@@ -77,6 +78,7 @@ function Table(props) {
     var nLinhasVazias = 10
     if (pageSelecionada != null) {
         nLinhasVazias = 10 - pageSelecionada.length
+        console.log(pageSelecionada.length)
     }
     for (let i = 0; i < nLinhasVazias; i++) {
         emptyRows.push((<LinhaVazia></LinhaVazia>))
