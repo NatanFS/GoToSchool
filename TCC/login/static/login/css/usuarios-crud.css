@@ -11,3 +11,49 @@
     border-radius: 25px;
     object-fit: cover;
 }
+
+/* Search bar */
+
+
+form input[type="submit"]{
+    display: none;
+}
+.search{
+    position: relative;
+}
+
+
+.search span.search{
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    color: rgb(7, 7, 70);
+    transform: translateY(-50%);
+}
+
+.search span.search:hover{
+    cursor: pointer;
+}
+
+.search span.cancel{
+    position: absolute;
+    font-size: 12px;
+    color: gray;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+}
+
+.search span.cancel:hover{
+    cursor: pointer;
+}
+
+.search input{
+    padding-left: 30px;
+    padding-right: 30px;
+    border-radius: 50px;
+}
+
+.search-options label{
+    margin-right: 5px;
+}

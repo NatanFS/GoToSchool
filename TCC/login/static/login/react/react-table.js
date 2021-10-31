@@ -11,42 +11,16 @@ export const Table = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [totalPages, setTotalPages] = useState(1)
-
+    var isSearching = true
+    
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true)
-            const res = await fetch("API/usuarios")
-            const resJSON = await res.json()
-            const data = JSON.parse(resJSON)
-            const dataArr = Object.values(data.usuarios)
-            const totalUsers = data.total
-            setTotalUsers(totalUsers)
-            setData(dataArr)
-            setLoading(false)
-        }
-
-        fetchData()
+        initTable()
     }, [])
 
     useEffect(() => {
         if(totalUsers > data.length && data.length > 0){
-            
-            const fetchData = async (lastkey, oldData, currentPageIndex) => {
-                setLoading(true)
-                console.log('LastKey:' + lastKey)
-                const res = await fetch("API/usuarios", {method: 'POST', body: JSON.stringify({lastkey: lastkey})})
-                const resJSON = await res.json()
-                const data = JSON.parse(resJSON)
-                const dataArr = Object.values(data.usuarios)
-                const totalUsers = data.total
-                const newData = oldData.concat(dataArr)
-                setTotalUsers(totalUsers)
-                setData(newData)
-                setLoading(false)
-            }
-            
             const lastKey = data.at(-1)["idUsuario"]
-            fetchData(lastKey, data, pageIndex)
+            getNewData(lastKey, data, pageIndex)
         }
 
         
@@ -86,6 +60,38 @@ export const Table = () => {
         </tr>)
     }
 
+     
+    const getNewData = async (lastkey, oldData, currentPageIndex) => {
+        setLoading(true)
+        const res = await fetch("API/usuarios", {method: 'POST', body: JSON.stringify({lastkey: lastkey})})
+        const resJSON = await res.json()
+        const data = JSON.parse(resJSON)
+        const dataArr = Object.values(data.usuarios)
+        if(dataArr.length == 0){
+            isSearching = true
+            return false;
+        }
+        const totalUsers = data.total
+        const newData = oldData.concat(dataArr)
+        console.log("SET")
+        setTotalUsers(totalUsers)
+        setData(newData)
+        setLoading(false)
+        
+    }
+
+    const initTable = async () => {
+        setLoading(true)
+        const res = await fetch("API/usuarios")
+        const resJSON = await res.json()
+        const data = JSON.parse(resJSON)
+        const dataArr = Object.values(data.usuarios)
+        const totalUsers = data.total
+        setTotalUsers(totalUsers)
+        setData(dataArr)
+        setLoading(false)
+    }
+
     function goToUser(row){
         var uid = row.original.idUsuario
         window.location.pathname =(`usuario/${uid}`) 
@@ -115,7 +121,60 @@ export const Table = () => {
         }
     }
 
+    function cancelSearch(){
+        initTable()
+        const searchField = document.querySelector("#search-input")
+        searchField.value = ""
+    }
+
+    async function search(){
+        const searchInput = document.querySelector('#search-input')
+        const option = document.querySelector('#search-options').value
+        const text = searchInput.value
+        const res = await fetch("API/usuarios", {method: "POST", body: JSON.stringify({'search': text, 'type': option})})
+        const resJSON = await res.json()
+        const data = JSON.parse(resJSON)
+        if(!data.usuarios){
+            return initTable()
+        }
+        console.log(data)
+        const usuariosArr = Object.values(data.usuarios)
+        setTotalUsers(data.total)
+        setData(usuariosArr)
+    }
+
     return (<>
+        <form action="JavaScript:search()">
+            <div className="search-container d-flex flex-row align-items-center">
+                
+                <div className="search col-8">
+                    <div className="icon-container">
+                        <span className="fas fa-search search" onClick={search}></span>
+                    </div>
+
+                    <div className="icon-container">
+                        <span className="fas fa-times cancel" onClick={cancelSearch}></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input id="search-input" type="text" className="form-control"></input>
+                    </div>
+                </div>
+                
+                <div class="form-group col-4 search-options"> 
+                    <label for="search-options">Pesquisar por:</label>
+                    <select id="search-options" name="search-options">
+                    <option value="nome">Nome</option>
+                    <option value="email">E-mail</option>
+                    <option value="cpf">CPF</option>
+                    <option value="turno">Turno</option>
+                    </select>
+                </div>
+            </div>
+            <div className="d-grid">
+                <input type="submit" id="search-button" onClick={search} className="btn btn-primary" value="Pesquisar"></input>
+            </div>            
+        </form>
         <table {...getTableProps()} class="table table-light table-striped table-hover align-middle">
             <thead>
                 {headerGroups.map((headerGroup) => (

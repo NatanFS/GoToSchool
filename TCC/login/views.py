@@ -238,9 +238,31 @@ def get_usuarios(request):
     if(request.method == "POST"):
         data = json.loads(request.body)
         userID = data.get("lastkey", "")
-        usuarios = dbRealtime.child("dados/usuarios")\
-            .order_by_child('idUsuario').start_at(userID).limit_to_first(11).get().val()
-        del usuarios[userID]
+        search = data.get("search", "")
+        type = data.get("type", "").upper()
+        
+        
+        if(search):
+            if(type == "NOME"):
+                usuarios = dbRealtime.child("dados/usuarios")\
+                .order_by_child('nome').start_at(search).limit_to_first(11).get().val()
+                print(search)
+            elif(type == "EMAIL"):
+                usuarios = dbRealtime.child("dados/usuarios")\
+                .order_by_child('email').start_at(search).limit_to_first(11).get().val()
+                print(search)
+            elif(type == "CPF"):
+                usuarios = dbRealtime.child("dados/usuarios")\
+                .order_by_child('cpf').start_at(search).limit_to_first(11).get().val()
+                print(search)
+            elif(type == "TURNO"):
+                usuarios = dbRealtime.child("dados/usuarios")\
+                .order_by_child('turno').start_at(search).limit_to_first(11).get().val()
+                print(search)
+        else:
+            usuarios = dbRealtime.child("dados/usuarios")\
+                .order_by_child('idUsuario').start_at(userID).limit_to_first(11).get().val()
+            del usuarios[userID]
     else:
         usuarios = dbRealtime.child("dados/usuarios")\
             .order_by_child('idUsuario').limit_to_first(10).get().val()
@@ -261,11 +283,12 @@ def usuario_view(request, uid):
             email =  form.cleaned_data["email"]
             turno =  form.cleaned_data["turno"]
             status =  form.cleaned_data["status"]
-            dbRealtime.child(f"dados/usuarios/{uid}/nome").set(nome)
-            dbRealtime.child(f"dados/usuarios/{uid}/cpf").set(cpf)
-            dbRealtime.child(f"dados/usuarios/{uid}/email").set(email)
-            dbRealtime.child(f"dados/usuarios/{uid}/status").set(status)
-            dbRealtime.child(f"dados/usuarios/{uid}/turno").set(turno)
+            usuario = {'nome': nome, 'cpf': cpf, 'email': email, 'turno': turno, "status": status,}
+            dbRealtime.child(f"dados/usuarios/{uid}").update(usuario)
+            # dbRealtime.child(f"dados/usuarios/{uid}/cpf").set(cpf)
+            # dbRealtime.child(f"dados/usuarios/{uid}/email").set(email)
+            # dbRealtime.child(f"dados/usuarios/{uid}/status").set(status)
+            # dbRealtime.child(f"dados/usuarios/{uid}/turno").set(turno)
         else:
             messages.error(request, form.errors)
     else:
