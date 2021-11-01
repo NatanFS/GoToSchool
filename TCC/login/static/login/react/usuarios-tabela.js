@@ -12,9 +12,8 @@ export const TableUsuarios = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [totalPages, setTotalPages] = useState(1)
-
+    const [message, setMessage] = useState("")
     var downloadedPages = 0
-    var isSearching = true
     var type = ""
     useEffect(() => {
         initTable()
@@ -86,7 +85,6 @@ export const TableUsuarios = () => {
         const data = JSON.parse(resJSON)
         const dataArr = Object.values(data.usuarios)
         if(dataArr.length == 0){
-            isSearching = true
             return false;
         }
         const totalUsers = data.total
@@ -109,6 +107,7 @@ export const TableUsuarios = () => {
         setTotalUsers(totalUsers)
         setData(dataArr)
         setLoading(false)
+        setMessage(`Exibindo ${showingUsersNumber()} de ${totalUsers} Usuários`)
         console.log("init")
     }
 
@@ -162,6 +161,7 @@ export const TableUsuarios = () => {
         }
         console.log("search")
         const usuariosArr = Object.values(data.usuarios)
+        setMessage(`Usuários`)
         setTotalUsers(data.total)
         setData(usuariosArr)
     }
@@ -277,7 +277,7 @@ export const TableUsuarios = () => {
         <button className="btn" onClick={previousPage} style={visibilityButtonPrevious()}>
                 <span className="fas fa-arrow-left"  ></span>
             </button>
-            Exibindo {showingUsersNumber()} de {totalUsers} Usuários
+            {message}
             <button className="btn" onClick={nextPage} style={visibilityButtonNext()}>
                 <span className="fas fa-arrow-right" ></span>
             </button>
