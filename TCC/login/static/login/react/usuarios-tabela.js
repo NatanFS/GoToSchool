@@ -1,9 +1,10 @@
 const useTable = window.ReactTable.useTable
 const usePagination = window.ReactTable.usePagination
+console.log(window)
 const useState = React.useState
 const useMemo = React.useMemo
 const useEffect = React.useEffect
-export const Table = () => {
+export const TableUsuarios = () => {
     const columns = useMemo(() => COLUMNS, [])
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(false)
@@ -11,20 +12,28 @@ export const Table = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [totalPages, setTotalPages] = useState(1)
+
+    var downloadedPages = 0
     var isSearching = true
-    
+    var type = ""
     useEffect(() => {
         initTable()
     }, [])
 
     useEffect(() => {
-        if(totalUsers > data.length && data.length > 0){
+        if(totalUsers > data.length && data.length > 0 && downloadedPages < 3){
             const lastKey = data.at(-1)["idUsuario"]
-            getNewData(lastKey, data, pageIndex)
+            getNewData(lastKey, data, type)
+            downloadedPages +=1
         }
-
-        
     }, [data]) 
+
+    useEffect(() =>{
+        if(downloadedPages == 3){
+            downloadedPages = 0
+            getNewData()
+        }
+    }, downloadedPages)
 
     const tableInstance = useTable({
         columns,
@@ -60,10 +69,19 @@ export const Table = () => {
         </tr>)
     }
 
+    function nextPageCustom(){
+        nextPage()
+        downloadedPages-=1
+    }
+
+    function previousPageCustom(){
+        previousPage()
+        downloadedPages-=1
+    }
      
-    const getNewData = async (lastkey, oldData, currentPageIndex) => {
+    const getNewData = async (lastkey, oldData, type) => {
         setLoading(true)
-        const res = await fetch("API/usuarios", {method: 'POST', body: JSON.stringify({lastkey: lastkey})})
+        const res = await fetch("API/usuarios", {method: 'POST', body: JSON.stringify({lastkey: lastkey, type: type})})
         const resJSON = await res.json()
         const data = JSON.parse(resJSON)
         const dataArr = Object.values(data.usuarios)
@@ -73,7 +91,7 @@ export const Table = () => {
         }
         const totalUsers = data.total
         const newData = oldData.concat(dataArr)
-        console.log("SET")
+        console.log("new data")
         setTotalUsers(totalUsers)
         setData(newData)
         setLoading(false)
@@ -87,9 +105,11 @@ export const Table = () => {
         const data = JSON.parse(resJSON)
         const dataArr = Object.values(data.usuarios)
         const totalUsers = data.total
+        type = ""
         setTotalUsers(totalUsers)
         setData(dataArr)
         setLoading(false)
+        console.log("init")
     }
 
     function goToUser(row){
@@ -99,15 +119,15 @@ export const Table = () => {
 
     function showingUsersNumber() {
         if(canNextPage){
-            return (<> {pageIndex*10} </>)
+            return ((pageIndex*10) + 1) + " - " + (pageIndex+1)*10
         } else {
-            return (<> {totalUsers%10} </>)
+            return ((pageIndex*10) + 1) + " - " + totalUsers
         }
     }
 
     function visibilityButtonNext(){
         if(canNextPage){
-            return {"display":"block"}
+            return {"display":"inline-block"}
         } else {
             return {"display":"none"}
         }
@@ -115,7 +135,7 @@ export const Table = () => {
 
     function visibilityButtonPrevious(){
         if(canPreviousPage){
-            return {"display":"block"}
+            return {"display":"inline-block"}
         } else {
             return {"display":"none"}
         }
@@ -131,20 +151,60 @@ export const Table = () => {
         const searchInput = document.querySelector('#search-input')
         const option = document.querySelector('#search-options').value
         const text = searchInput.value
+        if(text == ""){
+            return cancelSearch()
+        }
         const res = await fetch("API/usuarios", {method: "POST", body: JSON.stringify({'search': text, 'type': option})})
         const resJSON = await res.json()
         const data = JSON.parse(resJSON)
         if(!data.usuarios){
             return initTable()
         }
-        console.log(data)
+        console.log("search")
         const usuariosArr = Object.values(data.usuarios)
         setTotalUsers(data.total)
         setData(usuariosArr)
     }
 
+    // Filtra apenas os usuários que ainda não receberam uma resposta quanto ao seu pedido de cadastro.
+    async function getRequests(){
+        const res = await fetch("API/usuarios", {method: "POST", body: JSON.stringify({'type': "aguardando"})})
+        const resJSON = await res.json()
+        const data = JSON.parse(resJSON)
+        type = "aguardando"
+        gotoPage(0)
+        console.log("getrequest")
+        if(!data.usuarios){
+            var arr = []
+            setTotalUsers(0)
+            setData(arr)
+        } else {
+            const usuariosArr = Object.values(data.usuarios)
+            setTotalUsers(data.total)
+            setData(usuariosArr)
+        }
+        
+    }
+
+
+
     return (<>
-        <form action="JavaScript:search()">
+
+    <div class="card text-center">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-tab-target="#todos" aria-current="true" href="#" onClick={initTable}>Todos</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" data-tab-target="#pendentes" href="#" onClick={getRequests}>Aguardando resposta</a>
+                </li>
+            </ul>
+        </div>
+        
+        
+        <form action="JavaScript:search()" className="search-form active">
             <div className="search-container d-flex flex-row align-items-center">
                 
                 <div className="search col-8">
@@ -222,10 +282,8 @@ export const Table = () => {
                 <span className="fas fa-arrow-right" ></span>
             </button>
        </div>
+    </div>
     </>
 )
     
 }
-
-ReactDOM.render(<Table />,
-    document.querySelector('main'))

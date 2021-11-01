@@ -9,15 +9,45 @@
 <script src="https://unpkg.com/react-table@7.5.0/dist/react-table.production.min.js" type="text/babel"  ></script>
 <script src="{% static 'login/react/columns.js' %}"></script>
 <script src="{% static 'login/react/MOCK_DATA (1).js' %}"></script>
-<script src="{% static 'login/react/react-table.js' %}" type="text/babel"></script>
+<script src="{% static 'login/react/usuarios-tabela.js' %}" type="text/babel"></script>
 
 {% endblock %}
 
 {% block body %}
-<div class="table">
-    <main class="h-100">
+    <div class="table">
+        <main class="h-100">
 
-    </main>
-</div>
+        </main>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/babel">
+        ReactDOM.render(<TableUsuarios />, document.querySelector('main'))
+        // Card-tabs
+            const tabs = document.querySelectorAll('[data-tab-target]')
+            const search = document.querySelector('form')
+            console.log(search)
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    if(tab.dataset.tabTarget == "#todos"){
+                        search.classList.add('active')
+
+                    }
+
+                    if(tab.dataset.tabTarget == "#pendentes"){
+                        search.classList.remove('active')
+                    }
+
+                    tabs.forEach(tab => {
+                        tab.classList.remove('active')
+                    })
+                    
+                    tab.classList.add('active')
+                })
+            })
+      
+    </script>
 {% endblock %}
 

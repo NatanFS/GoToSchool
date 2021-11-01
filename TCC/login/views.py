@@ -235,13 +235,14 @@ def usuarios_view(request):
 @login_required
 @csrf_exempt
 def get_usuarios(request):
+    dados_usuarios = dbFirestore.document("dados/usuarios").get().to_dict()
+    total = dados_usuarios["numero"]
+    
     if(request.method == "POST"):
         data = json.loads(request.body)
         userID = data.get("lastkey", "")
         search = data.get("search", "")
         type = data.get("type", "").upper()
-        
-        
         if(search):
             if(type == "NOME"):
                 usuarios = dbRealtime.child("dados/usuarios")\
@@ -259,15 +260,33 @@ def get_usuarios(request):
                 usuarios = dbRealtime.child("dados/usuarios")\
                 .order_by_child('turno').start_at(search).limit_to_first(11).get().val()
                 print(search)
+        elif (type == "AGUARDANDO"):
+            total = dados_usuarios["aguardando"]
+            if(not userID):
+                usuarios = dbRealtime.child("dados/usuarios")\
+                    .order_by_child('status').start_at(0).end_at(0)\
+                    .limit_to_first(11).get().val()
+            else: 
+                usuariosFiltro = dbRealtime.child("dados/usuarios")\
+                .order_by_child('idUsuario').start_at(userID).limit_to_first(11).get().val()
+                del usuariosFiltro[userID]
+                
+                usuarios = []
+                for usuario in usuariosFiltro:
+                    usuario = usuariosFiltro[usuario]
+                    print(usuario)
+                    if usuario["status"] == 0:
+                        usuarios.push(usuario)
         else:
             usuarios = dbRealtime.child("dados/usuarios")\
                 .order_by_child('idUsuario').start_at(userID).limit_to_first(11).get().val()
             del usuarios[userID]
+
     else:
         usuarios = dbRealtime.child("dados/usuarios")\
             .order_by_child('idUsuario').limit_to_first(10).get().val()
             
-    total = dbFirestore.document("dados/usuarios").get().to_dict()["numero"]
+    
     data = {"usuarios": usuarios, "total": total}
     dataJSON = json.dumps(data)
     return JsonResponse(dataJSON, safe=False)
@@ -283,12 +302,14 @@ def usuario_view(request, uid):
             email =  form.cleaned_data["email"]
             turno =  form.cleaned_data["turno"]
             status =  form.cleaned_data["status"]
+            docUsuarios = dbFirestore.document("dados/usuarios")
             usuario = {'nome': nome, 'cpf': cpf, 'email': email, 'turno': turno, "status": status,}
+            status = dbRealtime.child(f"dados/usuarios/{uid}/status").get().val()
+            if status == "0" and status != usuario["status"]:
+                docUsuarios.update({"aguardando": Increment(-1)})
+            elif usuario["status"] == "0":
+                docUsuarios.update({"aguardando": Increment(1)})
             dbRealtime.child(f"dados/usuarios/{uid}").update(usuario)
-            # dbRealtime.child(f"dados/usuarios/{uid}/cpf").set(cpf)
-            # dbRealtime.child(f"dados/usuarios/{uid}/email").set(email)
-            # dbRealtime.child(f"dados/usuarios/{uid}/status").set(status)
-            # dbRealtime.child(f"dados/usuarios/{uid}/turno").set(turno)
         else:
             messages.error(request, form.errors)
     else:

@@ -15,8 +15,16 @@
 /* Search bar */
 
 
-form input[type="submit"]{
+.search-form input[type="submit"]{
     display: none;
+}
+
+.search-form{
+    display: none;
+}
+
+.search-form.active {
+    display: block;
 }
 .search{
     position: relative;
