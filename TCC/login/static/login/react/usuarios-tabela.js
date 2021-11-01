@@ -274,11 +274,11 @@ export const TableUsuarios = () => {
             </tbody>
         </table>
        <div style={{padding: 5 + 'px'}}>
-        <button className="btn" onClick={previousPage} style={visibilityButtonPrevious()}>
+        <button className="btn" onClick={previousPageCustom} style={visibilityButtonPrevious()}>
                 <span className="fas fa-arrow-left"  ></span>
             </button>
             {message}
-            <button className="btn" onClick={nextPage} style={visibilityButtonNext()}>
+            <button className="btn" onClick={nextPageCustom} style={visibilityButtonNext()}>
                 <span className="fas fa-arrow-right" ></span>
             </button>
        </div>
