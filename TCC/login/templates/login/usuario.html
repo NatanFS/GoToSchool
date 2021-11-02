@@ -10,14 +10,14 @@
 
 <div class="row container-fluid container-usuario">
    
-        <div class="col-xs-12 col-sm-4 col-md-2 container-usuario-foto">
+        <div class="col-xs-12 col-sm-4 col-md-4 container-usuario-foto">
             <img src="{{fotoURL}}" class="foto-usuario" height="150px" width="150px">
         </div>
     
 
     
 
-    <form method="POST" class="col-xs-12 col-sm-8 col-md-10" id="editar-dados-usuario">
+    <form method="POST" class="col-xs-12 col-sm-8 col-md-8" id="editar-dados-usuario">
         {% csrf_token %}
         {% for field in form %}
         
