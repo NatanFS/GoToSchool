@@ -380,6 +380,13 @@ def ouvidoria_view(request):
 
 @login_required    
 def onibus_view(request):
+    onibusSnapshot = dbRealtime.child("dados/onibuslista").get().val()
+    onibusLista = []
+    for onibusKey in onibusSnapshot:
+        onibus = onibusSnapshot[onibusKey]
+        print(onibus)
+        onibusLista.append(onibus)
+        
     if request.method == "POST":
         form = OnibusForm(request.POST)
         if form.is_valid():
@@ -411,4 +418,4 @@ def onibus_view(request):
             
             dbRealtime.child(f"dados/onibuslista/{onibus['nome']}").set(onibus)
     form = OnibusForm()
-    return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form})
+    return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form, "onibusLista": onibusLista})
