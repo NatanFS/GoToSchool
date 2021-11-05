@@ -12,10 +12,10 @@
 
 
 <div class="container-fluid content">
-    <div class="row">
+    <div class="row card-row">
         <div class="onibus-lista-container col-12 col-sm-5">
             {% for onibus in onibusLista %}
-                <a class="card-link " href="#" >
+                <a class="card-link " href="#" onclick='selectOnibus("{{onibus}}")' >
                     <div class="card mb-3 mx-auto" style="max-width: 540px;">
                         <div class="row g-0">
                         <div class="col-md-4 text-center">
@@ -88,45 +88,93 @@
                 </div>
             {% endfor %}
         
-            <label for="horarioIdaSaida"> Horário de saída do ônibus  (Viagem de ida)</label>
+            <label for="idaSaida"> Horário de saída do ônibus  (Viagem de ida)</label>
             <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
-                <input type="text" class="form-control" name="horarioIdaSaida" value="00:00">
+                <input type="text" class="form-control" name="idaSaida" value="00:00">
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-time"></span>
                 </span>
             </div>
-            <label for="horarioIdaChegada"> Horário de chegada ônibus (Viagem de ida) </label>
+            <label for="idaChegada"> Horário de chegada ônibus (Viagem de ida) </label>
             <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
-                <input type="text" class="form-control" name="horarioIdaChegada" value="00:00">
+                <input type="text" class="form-control" name="idaChegada" value="00:00">
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-time"></span>
                 </span>
             </div>
-            <label for="horarioVoltaSaida"> Horário de saída do ônibus (Retorno)</label>
+            <label for="retornoSaida"> Horário de saída do ônibus (Retorno)</label>
             <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
-                <input type="text" class="form-control" name="horarioVoltaSaida" value="00:00">
+                <input type="text" class="form-control" name="retornoSaida" value="00:00">
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-time"></span>
                 </span>
             </div>
-            <label for="horarioVoltaChegada"> Horário de chegada ônibus (Retorno)</label>
+            <label for="retornoChegada"> Horário de chegada ônibus (Retorno)</label>
             <div class="input-group clockpicker" data-placement="top" data-align="left" data-autoclose="true">
-                <input type="text" class="form-control" name="horarioVoltaChegada" value="00:00">
+                <input type="text" class="form-control" name="retornoChegada" value="00:00">
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-time"></span>
                 </span>
             </div>
         
-            <div class="row ">
-                <div class="col d-flex justify-content-end p-3">
-                    <button type="submit" class="btn btn-primary">Adicionar</button>
+            <div class="row pt-3">
+                <div class="col-6 d-grid">
+                    <button id="limpar" type="button" class="btn btn-danger">Limpar</button>
+                </div>
+                <div class="col-6 d-grid">
+                    <button id="adicionar" type="submit" class="btn btn-primary">Adicionar</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
+<script>
+    const nome = document.querySelector("input[name='nome']")
+    const placa = document.querySelector("input[name='placa']")
+    const turno = document.querySelector("select[name='turno']")
+    const capacidade = document.querySelector("input[name='capacidade']")
+    const idaSaida = document.querySelector("input[name='idaSaida']")
+    const idaChegada = document.querySelector("input[name='idaChegada']")
+    const retornoSaida = document.querySelector("input[name='retornoSaida']")
+    const retornoChegada = document.querySelector("input[name='retornoChegada']")
+    const btnAdicionar = document.querySelector("#adicionar")
+    const btnLimpar = document.querySelector("#limpar")
+    btnLimpar.style.display = "none"
+    btnLimpar.onclick = limpar
 
+    function selectOnibus(onibus){
+        var onibusString = onibus.replaceAll("\'", "\"")
+        var onibus = JSON.parse(onibusString)
+        nome.value = onibus.nome
+        nome.readOnly = true
+        placa.value = onibus.placa
+        turno.selected = onibus.turno
+        capacidade.value = onibus.vagasTotal
+        idaSaida.value = onibus.horarioIdaSaida.replace(" h", "")
+        idaChegada.value = onibus.horarioIdaChegada.replace(" h", "")
+        retornoSaida.value = onibus.horarioVoltaSaida.replace(" h", "")
+        retornoChegada.value = onibus.horarioVoltaChegada.replace(" h", "")
+        btnAdicionar.innerHTML = "Editar"
+        btnLimpar.style.display = "block"
+    }
+
+    function limpar(){
+        console.log("limpar")
+        nome.value = ""
+        nome.readOnly = false
+        placa.value = ""
+        turno.selected = "matutino"
+        capacidade.value = ""
+        idaSaida.value = ""
+        idaChegada.value = ""
+        retornoSaida.value = ""
+        retornoChegada.value = ""
+        btnLimpar.style.display = "none"
+        btnAdicionar.innerHTML = "Adicionar"
+    }
+
+</script>
 
 <script type="text/javascript">
     $('.clockpicker').clockpicker();

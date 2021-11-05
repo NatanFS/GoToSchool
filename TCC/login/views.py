@@ -345,10 +345,42 @@ def avisos_view(request):
             }
 
             dbRealtime.child(f"dados/avisos/{aviso_id}").set(aviso)
-            return render(request, "login/avisos.html" , {'title': "Gerenciar avisos", "form": form}) 
-    form = AvisoForm()
-    return render(request, "login/avisos.html" , {'title': "Gerenciar avisos", "form": form})    
+        else:
+            return render(request, "login/avisos.html" , {'title': "Gerenciar avisos", "form": form})
+        
+    avisosSnapshot = dbRealtime.child(f"dados/avisos").get().val()
+    avisos = []
+    for key, aviso in avisosSnapshot.items():
+        usuario = dbRealtime.child(f"dados/usuarios/{aviso['idUsuario']}").get().val()
+        aviso['usuario'] = usuario
+        
+        avisos.append(aviso)
+    print(avisos)
+    avisos.sort(key=lambda aviso: aviso['timeinmilis'])
     
+    form = AvisoForm()
+    return render(request, "login/avisos.html" , {'title': "Gerenciar avisos", "form": form, "avisos": avisos})    
+
+@login_required 
+@csrf_exempt
+def getComentarios(request, idAviso):
+    print(idAviso)
+    comentarios = dbRealtime.child(f"dados/avisos/{idAviso}/comentarios").get().val()
+    if comentarios == None:
+        return JsonResponse(None, safe=False)
+    usuariosIDs = []
+    usuarios = []
+    for key, comentario in comentarios.items():
+        usuarioID = comentario["usuarioID"]
+        if not usuarioID in usuariosIDs:
+            usuario = dbRealtime.child(f"dados/usuarios/{usuarioID}").get().val()
+            usuarios.append(usuario)
+            usuariosIDs.append(usuarioID)
+    data = {}
+    data['comentarios'] = comentarios
+    data['usuarios'] = usuarios
+    dataJSON = json.dumps(data)
+    return JsonResponse(dataJSON, safe=False)
 @login_required    
 def motoristas_view(request):
     if request.method == "GET":
@@ -380,15 +412,9 @@ def ouvidoria_view(request):
 
 @login_required    
 def onibus_view(request):
-    onibusSnapshot = dbRealtime.child("dados/onibuslista").get().val()
-    onibusLista = []
-    for onibusKey in onibusSnapshot:
-        onibus = onibusSnapshot[onibusKey]
-        print(onibus)
-        onibusLista.append(onibus)
-        
     if request.method == "POST":
         form = OnibusForm(request.POST)
+        print(form.errors)
         if form.is_valid():
             data = form.cleaned_data
             onibus = {
@@ -398,13 +424,13 @@ def onibus_view(request):
                 "vagasTotal": data["capacidade"],
                 "vagasOcupadas": 0,
                 "vagasDisponiveis": data["capacidade"],
-                "horarioIdaSaida": request.POST["horarioIdaSaida"] + " h",
-                "horarioIdaChegada": request.POST["horarioIdaChegada"] + " h",
-                "horarioVoltaSaida": request.POST["horarioVoltaSaida"] + " h",
-                "horarioVoltaChegada": request.POST["horarioVoltaChegada"] + " h",
+                "horarioIdaSaida": request.POST["idaSaida"] + " h",
+                "horarioIdaChegada": request.POST["idaChegada"] + " h",
+                "horarioVoltaSaida": request.POST["retornoSaida"] + " h",
+                "horarioVoltaChegada": request.POST["retornoChegada"] + " h",
                 "onibusTurnoID": PushID().next_id()
             }
-            
+            print(onibus)
             # Tornar ônibus disponível para os próximos dias.
             QUANTIDADE_DE_DIAS = 10
             locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8' )
@@ -416,6 +442,15 @@ def onibus_view(request):
                     dbRealtime.child(f"dados/dias/{dateText}/turnos/{onibus['turnoPadrao']}/onibusLista/{onibus['nome']}").update(onibus)
                 date += timedelta(days=1)
             
-            dbRealtime.child(f"dados/onibuslista/{onibus['nome']}").set(onibus)
+            dbRealtime.child(f"dados/onibuslista/{onibus['nome']}").update(onibus)
+        else:    
+            return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form, "onibusLista": onibusLista})
+    
+    # Recupera ônibus    
+    onibusSnapshot = dbRealtime.child("dados/onibuslista").get().val()
+    onibusLista = []
+    for onibusKey in onibusSnapshot:
+        onibus = onibusSnapshot[onibusKey]
+        onibusLista.append(onibus)
     form = OnibusForm()
     return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form, "onibusLista": onibusLista})

@@ -1,30 +1,123 @@
 {% extends "login/layout.html" %}
 {% load static %}
 {% block head %}
-
+<link rel="stylesheet" href="{% static 'login/css/avisos.css' %}"></link>
 {% endblock %}
 
 {% block body %}
+<div class="container col-xs-12 col-sm-8 col-md-10 ">
+   <div class="row">
+    <form method="POST" class="mx-auto" id="editar-dados-usuario">
+        {% csrf_token %}
+        {% for field in form %}
+        
+            {% for error in field.errors %}
+            <div class="error-messages text-danger">
+                {{ error }}
+            </div> 
+            {%endfor%}
+            <div class="form-group">
+                {{field.label_tag}}
+                {{field}}
+            </div>
+        {% endfor %}
+        <div class="row ">
+            <div class="col d-flex justify-content-end p-3">
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </div>
+        </div>
+    </form>
 
-<form method="POST" class="col-xs-12 col-sm-8 col-md-10" id="editar-dados-usuario">
-    {% csrf_token %}
-    {% for field in form %}
-    
-        {% for error in field.errors %}
-        <div class="error-messages text-danger">
-            {{ error }}
-        </div> 
-        {%endfor%}
-        <div class="form-group">
-            {{field.label_tag}}
-            {{field}}
+    <div class="row mx-auto">
+        {% for aviso in avisos %}
+        <div class="col-12 col-lg-6">
+            <div class="card text-start p-0 mt-3 " id="{{aviso.idAviso}}">
+                <div class="card-header pe-lg-2">
+                <img src="{{aviso.usuario.urlFoto}}" alt="" class="foto-usuario me-2">
+                {{aviso.usuario.nome}}
+                </div>
+                <div class="card-body text-start">
+                <div class="aviso active" id="aviso-{{aviso.idAviso}}">
+                    <p class="card-text">{{aviso.texto}}</p>
+                </div>
+                <div class="comentarios-container" id="comentarios-container-{{aviso.idAviso}}">
+                    <div class="voltar-container">
+                        <a class="voltar" onclick='alternarViewAviso("{{aviso.idAviso}}")'>
+                            <span class="fas fa-arrow-left"></span>
+                            Voltar
+                        </a>
+                        <hr>
+                    </div>
+                    <div class="comentarios" id="comentarios-{{aviso.idAviso}}"></div>
+                </div>
+                </div>
+                <div class="card-footer text-muted">
+                <div class="d-flex justify-content-between">
+                    <a id="comentarios-btn-{{aviso.idAviso}}" class="comentarios-btn active" onclick='comentar("{{aviso.idAviso}}")'>Comentários</a>
+                    <div>{{aviso.data}}</div>
+                    <div></div>
+                </div>        
+                </div>
+            </div>
         </div>
+            
     {% endfor %}
-    <div class="row ">
-        <div class="col d-flex justify-content-end p-3">
-            <button type="submit" class="btn btn-primary">Adicionar aviso</button>
-        </div>
     </div>
-</form>
+   </div>
+</div>
+
+<script type="text/babel">
+   
+    async function comentar(idAviso){
+        alternarViewAviso(idAviso)
+        const res = await fetch(`API/comentarios/${idAviso}`)
+        const resJSON = await res.json()
+        const data = JSON.parse(resJSON)
+
+        const comentariosView = document.querySelector(`#comentarios-${idAviso}`)
+        if (data != null){
+            const comentarios = Object.values(data.comentarios)
+            const usuarios = Object.values(data.usuarios)
+            var comentariosHTML = ""
+            
+            comentarios.forEach((comentario) => {
+
+                let usuario = usuarios.find(usuario => {return usuario.idUsuario == comentario.usuarioID})
+                comentariosHTML += `<div class="comentario">\
+                    <div class="header d-flex align-items-center"> \
+                        <img class="foto-usuario-comentario me-2" src=${usuario.urlFoto} alt=""/> \
+                        <div class="nome-comentario"> ${usuario.nome} </div> \
+                    </div> \
+                    <div class="body-comentario"> \
+                        ${comentario.texto} \
+                    </div>\
+                    <hr/>\
+                </div>`
+        })
+        
+        } else {
+            comentariosHTML = "Não há comentários"
+        }
+
+        comentariosView.innerHTML = comentariosHTML
+        
+        
+        // var bodyView = document.querySelector(`#${idAviso}`);
+    }
+
+    function alternarViewAviso(idAviso){
+        const comentariosView = document.querySelector(`#comentarios-container-${idAviso}`)
+        const avisoView = document.querySelector(`#aviso-${idAviso}`)
+        const comentariosBtn = document.querySelector(`#comentarios-btn-${idAviso}`)
+        // comentariosView.style.display = 'block'
+        // avisoView.style.display = 'block'
+
+        comentariosView.classList.toggle('active')
+        avisoView.classList.toggle('active')
+        comentariosBtn.classList.toggle('active')
+
+    }
+</script>
+
 
 {% endblock %}

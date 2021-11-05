@@ -18,5 +18,6 @@ urlpatterns = [
     path("cadastro-staff", views.CadastrarStaff.as_view(), name=("cadastrar-staff")),
     path('requisicoes', views.requisicoes_view, name=('requisicoes')),
     path('API/requisicoes', views.getReqData, name=('reqData')),
+    path('API/comentarios/<str:idAviso>', views.getComentarios, name=('getComentarios')),
     path('requisicoes/answer', views.answerReq, name=("answerReq")),
 ]

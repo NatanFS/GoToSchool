@@ -1,0 +1,83 @@
+.foto-usuario{
+    height: 50px;
+    width: 50px;
+    border-radius: 25px;
+    object-fit: cover;
+}
+
+.voltar{
+    color: black;
+    text-decoration: none;
+   
+}
+.voltar:hover{
+    cursor: pointer;
+    color: black;
+}
+
+.voltar span{
+    margin-right: 5px;
+}
+
+.comentarios-btn{
+    visibility: hidden;
+}
+
+.comentarios-btn.active{
+    visibility: visible;
+}
+
+.aviso{
+    opacity: 0;
+    height: 0px;
+    position: static;
+    overflow:hidden;
+}
+
+.aviso.active{
+    opacity: 1;
+    height: auto;
+    position: inherit;
+    
+}
+
+.comentarios-container{
+    visibility: hidden;
+    height: 0px;
+    opacity: 0;
+    transition: 1s ease;
+    overflow-y: scroll;
+    position: static;
+    
+}
+
+.comentarios-container.active{
+    visibility: visible;
+    opacity: 1;
+    height: 400px;
+    position: inherit;
+}
+
+.foto-usuario-comentario{
+    height: 30px;
+    width: 30px;
+    border-radius: 25px;
+    object-fit: cover;
+}
+
+.nome-comentario{
+    font-weight: 500;
+    color: rgb(7, 7, 70);
+}
+
+.body-comentario{
+    padding-left: 40px;
+}
+
+form{
+    width: 100%;
+}
+
+a{
+    text-decoration: none;
+}

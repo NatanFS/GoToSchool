@@ -75,9 +75,9 @@ class OnibusForm(forms.Form):
         
 
 class AvisoForm(forms.Form):
-    texto = forms.CharField(widget=forms.Textarea)
+    texto = forms.CharField(widget=forms.Textarea, label="", help_text="")
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['texto'].widget.attrs.update({ 'class':('form-control '), })
+        self.fields['texto'].widget.attrs.update({ 'class':('form-control '), 'rows': (4), 'placeholder': "Adicione um aviso" })
         
         
