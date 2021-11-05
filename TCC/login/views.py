@@ -1,7 +1,7 @@
 import threading
 from time import time
 from login.forms import *
-from django.http.response import HttpResponseRedirect, JsonResponse
+from django.http.response import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 import firebase_admin
 from .util import initialize_firebase, recuperarOnibus, time_until_end_of_day
@@ -340,7 +340,7 @@ def avisos_view(request):
                 "idAviso": aviso_id,
                 "idUsuario": "GoToSchool",
                 "texto": data['texto'],
-                "timeinmilis": time(),
+                "timeinmilis": int(time()*1000),
                 "quantidadeComentarios": 0,
             }
 
@@ -355,16 +355,16 @@ def avisos_view(request):
         aviso['usuario'] = usuario
         
         avisos.append(aviso)
-    print(avisos)
-    avisos.sort(key=lambda aviso: aviso['timeinmilis'])
     
+    avisos.sort(key=lambda aviso: aviso['timeinmilis'], reverse=True)
+    for aviso in avisos:
+        print(aviso['timeinmilis'])
     form = AvisoForm()
     return render(request, "login/avisos.html" , {'title': "Gerenciar avisos", "form": form, "avisos": avisos})    
 
 @login_required 
 @csrf_exempt
 def getComentarios(request, idAviso):
-    print(idAviso)
     comentarios = dbRealtime.child(f"dados/avisos/{idAviso}/comentarios").get().val()
     if comentarios == None:
         return JsonResponse(None, safe=False)
@@ -381,6 +381,17 @@ def getComentarios(request, idAviso):
     data['usuarios'] = usuarios
     dataJSON = json.dumps(data)
     return JsonResponse(dataJSON, safe=False)
+
+@login_required 
+@csrf_exempt
+def removerAviso(request, idAviso):
+    if request.user.is_superuser:
+        dbRealtime.child(f"dados/avisos/{idAviso}").remove()
+        return JsonResponse(None, safe=False)
+    else:
+        return HttpResponseForbidden()
+    
+
 @login_required    
 def motoristas_view(request):
     if request.method == "GET":

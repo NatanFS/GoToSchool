@@ -35,6 +35,14 @@
                 <div class="card-header pe-lg-2">
                 <img src="{{aviso.usuario.urlFoto}}" alt="" class="foto-usuario me-2">
                 {{aviso.usuario.nome}}
+                <div class="dropdown" id="dropdown-{{aviso.idAviso}}" >
+                    <a class="dropdown-btn" onclick='dropdown("{{aviso.idAviso}}")'>
+                        <i class="fas fa-ellipsis-v menu-aviso"></i>
+                    </a>
+                    <div class="dropdown-content" id="dropdown-content-{{aviso.idAviso}}" >
+                        <a id='remove-link' onclick='removerAviso("{{aviso.idAviso}}")'> Remover </a>
+                    </div>
+                </div>
                 </div>
                 <div class="card-body text-start">
                 <div class="aviso active" id="aviso-{{aviso.idAviso}}">
@@ -67,6 +75,10 @@
 </div>
 
 <script type="text/babel">
+
+    if(window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
    
     async function comentar(idAviso){
         alternarViewAviso(idAviso)
@@ -116,6 +128,24 @@
         avisoView.classList.toggle('active')
         comentariosBtn.classList.toggle('active')
 
+    }
+
+    function dropdown(idAviso){
+        var dropdownContent = document.querySelector(`#dropdown-content-${idAviso}`)
+        dropdownContent.style.display = 'block'
+        var dropdown = document.querySelector(`#dropdown-${idAviso}`)
+        document.addEventListener("click", (event) => {
+            var isClickInside = dropdown.contains(event.target)
+            if(!isClickInside){
+                dropdownContent.style.display = 'none'
+            }
+        })
+       
+    }
+
+    function removerAviso(idAviso){
+        fetch(`avisos/remover/${idAviso}`)
+        location.reload()
     }
 </script>
 
