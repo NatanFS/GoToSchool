@@ -57,11 +57,13 @@
                         <hr>
                     </div>
                     <div class="comentarios" id="comentarios-{{aviso.idAviso}}"></div>
+                    <input type="text" class="form-control"/>
                 </div>
+                
                 </div>
                 <div class="card-footer text-muted">
                 <div class="d-flex justify-content-between">
-                    <a id="comentarios-btn-{{aviso.idAviso}}" class="comentarios-btn active" onclick='comentar("{{aviso.idAviso}}")'>Comentários</a>
+                    <a id="comentarios-btn-{{aviso.idAviso}}" class="comentarios-btn active" onclick='comentar("{{aviso.idAviso}}")'>Comentários {{aviso.ncomentarios}}</a>
                     <div>{{aviso.data}}</div>
                     <div></div>
                 </div>        

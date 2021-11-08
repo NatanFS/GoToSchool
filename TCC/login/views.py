@@ -238,7 +238,8 @@ def get_usuarios(request):
     dados_usuarios = dbFirestore.document("dados/usuarios").get().to_dict()
     total = dados_usuarios["numero"]
     
-    if(request.method == "POST"):
+    if(request.method ==
+       "POST"):
         data = json.loads(request.body)
         userID = data.get("lastkey", "")
         search = data.get("search", "")
@@ -353,7 +354,12 @@ def avisos_view(request):
     for key, aviso in avisosSnapshot.items():
         usuario = dbRealtime.child(f"dados/usuarios/{aviso['idUsuario']}").get().val()
         aviso['usuario'] = usuario
-        
+        comentarios = aviso.get('comentarios')
+        if comentarios:
+            ncomentarios = len(comentarios) 
+        else:
+            ncomentarios = 0
+        aviso['ncomentarios'] = ncomentarios
         avisos.append(aviso)
     
     avisos.sort(key=lambda aviso: aviso['timeinmilis'], reverse=True)
@@ -387,7 +393,7 @@ def getComentarios(request, idAviso):
 def removerAviso(request, idAviso):
     if request.user.is_superuser:
         dbRealtime.child(f"dados/avisos/{idAviso}").remove()
-        return JsonResponse(None, safe=False)
+        return JsonResponse({'message': 'Aviso removido'}, safe=False)
     else:
         return HttpResponseForbidden()
     

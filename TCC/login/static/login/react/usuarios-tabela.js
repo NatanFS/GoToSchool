@@ -204,7 +204,7 @@ export const TableUsuarios = () => {
         </div>
         
         
-        <form action="JavaScript:search()" className="search-form active">
+        <form action="JavaScript:search" id='search-form' className="search-form active">
             <div className="search-container d-flex flex-row align-items-center">
                 
                 <div className="search col-8">
