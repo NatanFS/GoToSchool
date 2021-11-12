@@ -33,37 +33,41 @@
         <div class="col-12 col-lg-6">
             <div class="card text-start p-0 mt-3 " id="{{aviso.idAviso}}">
                 <div class="card-header pe-lg-2">
-                <img src="{{aviso.usuario.urlFoto}}" alt="" class="foto-usuario me-2">
-                {{aviso.usuario.nome}}
-                <div class="dropdown" id="dropdown-{{aviso.idAviso}}" >
-                    <a class="dropdown-btn" onclick='dropdown("{{aviso.idAviso}}")'>
-                        <i class="fas fa-ellipsis-v menu-aviso"></i>
-                    </a>
-                    <div class="dropdown-content" id="dropdown-content-{{aviso.idAviso}}" >
-                        <a id='remove-link' onclick='removerAviso("{{aviso.idAviso}}")'> Remover </a>
+                    <img src="{{aviso.usuario.urlFoto}}" alt="" class="foto-usuario me-2">
+                    {{aviso.usuario.nome}}
+                    <div class="dropdown" id="dropdown-{{aviso.idAviso}}" >
+                        <a class="dropdown-btn" onclick='dropdown("{{aviso.idAviso}}")'>
+                            <i class="fas fa-ellipsis-v menu-aviso"></i>
+                        </a>
+                        <div class="dropdown-content" id="dropdown-content-{{aviso.idAviso}}" >
+                            <a id='remove-link' onclick='removerAviso("{{aviso.idAviso}}")'> Remover </a>
+                        </div>
                     </div>
-                </div>
                 </div>
                 <div class="card-body text-start">
-                <div class="aviso active" id="aviso-{{aviso.idAviso}}">
-                    <p class="card-text">{{aviso.texto}}</p>
-                </div>
-                <div class="comentarios-container" id="comentarios-container-{{aviso.idAviso}}">
-                    <div class="voltar-container">
-                        <a class="voltar" onclick='alternarViewAviso("{{aviso.idAviso}}")'>
-                            <span class="fas fa-arrow-left"></span>
-                            Voltar
-                        </a>
-                        <hr>
+                    <div class="aviso active" id="aviso-{{aviso.idAviso}}">
+                        <p class="card-text">{{aviso.texto}}</p>
                     </div>
-                    <div class="comentarios" id="comentarios-{{aviso.idAviso}}"></div>
-                    <input type="text" class="form-control"/>
-                </div>
-                
+                    <div class="comentarios-container" id="comentarios-container-{{aviso.idAviso}}">
+                        <div class="voltar-container">
+                            <a class="voltar" onclick='alternarViewAviso("{{aviso.idAviso}}")'>
+                                <span class="fas fa-arrow-left"></span>
+                                Voltar
+                            </a>
+                            <hr>
+                        </div>
+                        <div class="comentarios" id="comentarios-{{aviso.idAviso}}"></div>
+                        <form action="JavaScript:comentar('{{aviso.idAviso}}')">
+                            <div class="comentario-input form-group">
+                                <input type="text" id="comentario-input-{{aviso.idAviso}}" name="comentario" class="form-control"/>
+                            </div>
+                            <input type="submit" class="btn btn-primary" value="Comentar">
+                        </form>
+                    </div>
                 </div>
                 <div class="card-footer text-muted">
                 <div class="d-flex justify-content-between">
-                    <a id="comentarios-btn-{{aviso.idAviso}}" class="comentarios-btn active" onclick='comentar("{{aviso.idAviso}}")'>Comentários {{aviso.ncomentarios}}</a>
+                    <a id="comentarios-btn-{{aviso.idAviso}}" class="comentarios-btn active" onclick='comentariosView("{{aviso.idAviso}}")'>Comentários {{aviso.ncomentarios}}</a>
                     <div>{{aviso.data}}</div>
                     <div></div>
                 </div>        
@@ -82,8 +86,13 @@
         window.history.replaceState( null, null, window.location.href );
     }
    
-    async function comentar(idAviso){
+    function comentariosView(idAviso){
         alternarViewAviso(idAviso)
+        loadComentarios(idAviso)
+        // var bodyView = document.querySelector(`#${idAviso}`);
+    }
+
+    async function loadComentarios(idAviso){
         const res = await fetch(`API/comentarios/${idAviso}`)
         const resJSON = await res.json()
         const data = JSON.parse(resJSON)
@@ -114,9 +123,6 @@
         }
 
         comentariosView.innerHTML = comentariosHTML
-        
-        
-        // var bodyView = document.querySelector(`#${idAviso}`);
     }
 
     function alternarViewAviso(idAviso){
@@ -145,9 +151,15 @@
        
     }
 
-    function removerAviso(idAviso){
-        fetch(`avisos/remover/${idAviso}`)
-        location.reload()
+    async function removerAviso(idAviso){
+        await fetch(`avisos/remover/${idAviso}`)
+        window.location.reload()
+    }
+
+    function comentar(idAviso){
+        const comentarioTexto = document.querySelector(`#comentario-input-${idAviso}`).value
+        const res = fetch(`avisos/comentar/${idAviso}`, {method: 'POST', body: JSON.stringify({comentario: comentarioTexto})})
+        loadComentarios(idAviso)
     }
 </script>
 

@@ -6,7 +6,7 @@ from .models import User
 from datetime import date
 from datetime import datetime
 CHOICES_TURNO = (("matutino", "matutino"), ("vespertino", "vespertino"), ("noturno", "noturno"))
-CHOICES_STATUS = (("-1", "Desabilitado"), ("1", "Habilitado"), ("0", "Aguardando resposta"))
+CHOICES_STATUS = ((-1, "Desabilitado"), (1, "Habilitado"), (0, "Aguardando resposta"))
     
 class CadastrarStaffForm(UserCreationForm):
     def __init__(self, *args, **kwargs):

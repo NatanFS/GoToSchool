@@ -1,0 +1,13 @@
+.novidades-container{
+    box-shadow: 0px 0px 10px 0px rgba(0, 4, 255, 0.22);
+    border-radius: 16px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    height: calc(100vh - 100px);
+    overflow: scroll ;
+}
+
+.titulo{
+    color: 0a2342;
+    font-weight: bold;
+}

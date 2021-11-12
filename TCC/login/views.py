@@ -1,5 +1,7 @@
 import threading
 from time import time
+
+import numpy as np
 from login.forms import *
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -182,7 +184,7 @@ def answerReq(request):
     dataNotification["message"] = message
     dataNotification["title"] = "Requisições"
     enviarNotificacao(token, dataNotification)
-    return JsonResponse({"message": "Request aswered successfully."}, status=201)
+    return JsonResponse({"message": "Requisição respondida com sucesso."}, status=201)
 
 def enviarNotificacao(token, data):
     push_service = FCMNotification(api_key="AAAAKGgPQHI:APA91bH1DavnWFdUEaBNtFr_Qoxa0t9Cr9MAKoqC0kXvEpRireeMPgg1Q6M5NASp1IaPUsFG4bMpnzPRHn8IDC1Qs2aha57rEBGvC4f4tSaxcG-0x9y9DkyYNi-4jkxNR4ZX5iWNjfbX")
@@ -304,11 +306,11 @@ def usuario_view(request, uid):
             turno =  form.cleaned_data["turno"]
             status =  form.cleaned_data["status"]
             docUsuarios = dbFirestore.document("dados/usuarios")
-            usuario = {'nome': nome, 'cpf': cpf, 'email': email, 'turno': turno, "status": status,}
-            status = dbRealtime.child(f"dados/usuarios/{uid}/status").get().val()
-            if status == "0" and status != usuario["status"]:
+            usuario = {'nome': nome, 'cpf': cpf, 'email': email, 'turno': turno, "status": int(status),}
+            status = int(dbRealtime.child(f"dados/usuarios/{uid}/status").get().val())
+            if status == 0 and status != usuario["status"]:
                 docUsuarios.update({"aguardando": Increment(-1)})
-            elif usuario["status"] == "0":
+            elif usuario["status"] == 0 and not status == 0:
                 docUsuarios.update({"aguardando": Increment(1)})
             dbRealtime.child(f"dados/usuarios/{uid}").update(usuario)
         else:
@@ -418,9 +420,16 @@ def novidades_view(request):
             }
             
             dbRealtime.child(f"dados/novidades/{novidade_id}").set(novidade)
-            
+    else:
+        novidadesSnapshot = dbRealtime.child(f"dados/novidades").get().val()
+        novidades = list(novidadesSnapshot.values())
+        # novidadesList = list(novidadesDict.items())
+        # novidades = np.array(novidadesList)
+        # print(novidadesDict)
+        # print(novidadesList)
+        # print(novidades)
     form = NovidadeForm()
-    return render(request, "login/novidades.html" , {'title': "Gerenciar novidades",  "form": form})
+    return render(request, "login/novidades.html" , {'title': "Gerenciar novidades",  "form": form, "novidades": novidades})
     
 @login_required    
 def ouvidoria_view(request):
@@ -471,3 +480,21 @@ def onibus_view(request):
         onibusLista.append(onibus)
     form = OnibusForm()
     return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form, "onibusLista": onibusLista})
+
+@csrf_exempt
+@login_required
+def comentarAviso(request, idAviso):
+    if request.method == 'POST':       
+        data = json.loads(request.body)
+        comentarioTexto = data.get('comentario', '')
+        comentarioID = PushID().next_id()
+        comentario = {
+                "data": datetime.today().strftime('%d/%m/%Y') ,
+                "comentarioID": comentarioID,
+                "usuarioID": "GoToSchool",
+                "texto": comentarioTexto,
+                "timeinmilis": int(time()*1000),
+            }
+        
+        dbRealtime.child(f"dados/avisos/{idAviso}/comentarios/{comentarioID}/").set(comentario)
+        return JsonResponse({"message": "Comentário adicionado com sucesso."}, status=201)

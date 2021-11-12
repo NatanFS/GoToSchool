@@ -78,20 +78,29 @@ color: white}
     
 }
 
+.comentarios{
+    overflow-y: scroll;
+    height: 400px;
+}
+
+.comentario-input{
+    padding-top:16px;
+}
+
 .comentarios-container{
     visibility: hidden;
-    height: 0px;
+    max-height: 0px;
+    overflow-y: hidden;
     opacity: 0;
-    transition: 1s ease;
-    overflow-y: scroll;
+    transition: max-height 0.2s ease-out;
     position: static;
     
 }
 
 .comentarios-container.active{
+    max-height: 600px;
     visibility: visible;
     opacity: 1;
-    height: 400px;
     position: inherit;
 }
 

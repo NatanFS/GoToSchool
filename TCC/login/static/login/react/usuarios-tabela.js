@@ -13,14 +13,14 @@ export const TableUsuarios = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [totalPages, setTotalPages] = useState(1)
     const [message, setMessage] = useState("")
+    const [type, setType] = useState("")
     var downloadedPages = 0
-    var type = ""
     useEffect(() => {
         initTable()
     }, [])
 
     useEffect(() => {
-        if(totalUsers > data.length && data.length > 0 && downloadedPages < 3){
+        if(totalUsers > data.length && data.length > 0 && downloadedPages < 3 ){
             const lastKey = data.at(-1)["idUsuario"]
             getNewData(lastKey, data, type)
             downloadedPages +=1
@@ -79,21 +79,21 @@ export const TableUsuarios = () => {
     }
      
     const getNewData = async (lastkey, oldData, type) => {
-        setLoading(true)
-        const res = await fetch("API/usuarios", {method: 'POST', body: JSON.stringify({lastkey: lastkey, type: type})})
-        const resJSON = await res.json()
-        const data = JSON.parse(resJSON)
-        const dataArr = Object.values(data.usuarios)
-        if(dataArr.length == 0){
-            return false;
-        }
-        const totalUsers = data.total
-        const newData = oldData.concat(dataArr)
-        console.log("new data")
-        setTotalUsers(totalUsers)
-        setData(newData)
-        setLoading(false)
-        
+            console.log(type)
+            setLoading(true)
+            const res = await fetch("API/usuarios", {method: 'POST', body: JSON.stringify({lastkey: lastkey, type: type})})
+            const resJSON = await res.json()
+            const data = JSON.parse(resJSON)
+            const dataArr = Object.values(data.usuarios)
+            if(dataArr.length == 0){
+                return false;
+            }
+            const totalUsers = data.total
+            const newData = oldData.concat(dataArr)
+            console.log("new data")
+            setTotalUsers(totalUsers)
+            setData(newData)
+            setLoading(false)        
     }
 
     const initTable = async () => {
@@ -103,7 +103,7 @@ export const TableUsuarios = () => {
         const data = JSON.parse(resJSON)
         const dataArr = Object.values(data.usuarios)
         const totalUsers = data.total
-        type = ""
+        setType("")
         setTotalUsers(totalUsers)
         setData(dataArr)
         setLoading(false)
@@ -171,7 +171,7 @@ export const TableUsuarios = () => {
         const res = await fetch("API/usuarios", {method: "POST", body: JSON.stringify({'type': "aguardando"})})
         const resJSON = await res.json()
         const data = JSON.parse(resJSON)
-        type = "aguardando"
+        setType("aguardando")
         gotoPage(0)
         console.log("getrequest")
         if(!data.usuarios){
