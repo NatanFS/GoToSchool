@@ -96,12 +96,6 @@
                 <span class="links_name">Add Novidades</span>
               </a>
             </li>
-            <li>
-              <a class="nav-link" href="{% url 'ouvidoria' %}">
-                <i class='bx bxs-envelope' ></i>
-                <span class="links_name">Ouvidoria</span>
-              </a>
-            </li>
          {% if user.is_superuser %}
             <li>
               <a class="nav-link" href="{% url 'cadastrar-staff' %}">

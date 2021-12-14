@@ -11,15 +11,6 @@
 <div class="container-fluid ">
     <div class="row">
         <div class="novidades-container col-12 col-sm-5">
-            {% for novidade in novidades %}
-
-                <div class="novidade">
-                    <div class="titulo text-center">{{novidade.titulo}}</div>
-                    <div class="body">{{novidade.conteudo}}</div>
-                    <hr>
-                </div>
-
-            {% endfor %}
         </div>
         <form method="POST" class="col" id="editar-dados-usuario">
             {% csrf_token %}
@@ -45,21 +36,27 @@
 </div>
 
 <script>
-    const novidadesContainer = document.querySelector('novidades-container');
-    const novidadesString =(("{{novidades}}").replace(/&(l|g|quo|&#x27)t;/g, function(a,b){
+    const novidadesContainer = document.querySelector('.novidades-container');
+    const novidadesString = (("{{novidades}}")).replace(/&(l|g|quo|&#x27)t;/g, function(a,b){
                 return {
                     l   : '<',
                     g   : '>',
                     quo : '"',
                 }[b];
-            })).replaceAll("\'", '\\\"').replaceAll("'", '"').replaceAll("&#x27;", '"').replaceAll('\n', "\\n");
-            console.log(novidadesString)
-    const novidades = JSON.parse(novidadesString)
+            }).replaceAll("'", '"').replaceAll("&#x27;", '"').replaceAll('\n', "\\n");
     
-    console.log(novidades)
-    novidades.array.forEach(novidade => {
-        console.log(novidade)
+    var novidadesHTML = ""
+    const novidades = JSON.parse(novidadesString)
+    novidades.forEach(novidade => {
+        novidadesHTML += `<div class="novidade">
+                                <div class="titulo text-center">${novidade.titulo}</div>
+                                <div class="body">${novidade.conteudo}</div>
+                                <hr>
+                          </div>`
     });
+
+    novidadesContainer.innerHTML = novidadesHTML
+ 
 </script>
 
 {% endblock %}

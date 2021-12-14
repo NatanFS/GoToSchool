@@ -205,7 +205,7 @@ export const TableUsuarios = () => {
         
         
         <form action="JavaScript:search" id='search-form' className="search-form active">
-            <div className="search-container d-flex flex-row align-items-center">
+            <div className="search-container d-flex flex-row align-items-end justify-content-between me-1 ms-1">
                 
                 <div className="search col-8">
                     <div className="icon-container">
@@ -221,14 +221,16 @@ export const TableUsuarios = () => {
                     </div>
                 </div>
                 
-                <div class="form-group col-4 search-options"> 
-                    <label for="search-options">Pesquisar por:</label>
-                    <select id="search-options" name="search-options">
-                    <option value="nome">Nome</option>
-                    <option value="email">E-mail</option>
-                    <option value="cpf">CPF</option>
-                    <option value="turno">Turno</option>
-                    </select>
+                <div class="form-group col-4 search-options container"> 
+                    <div className="row col-8 mx-auto"> 
+                        <label for="search-options">Pesquisar por:</label>
+                        <select className="form-select form-select-md" id="search-options" name="search-options">
+                        <option value="nome">Nome</option>
+                        <option value="email">E-mail</option>
+                        <option value="cpf">CPF</option>
+                        <option value="turno">Turno</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div className="d-grid">
