@@ -12,8 +12,3 @@ def firstAndLast(value):
     return arr[0] + " " + arr[-1]
 
 register.filter('firstAndLast', firstAndLast)
-
-def jsonify(object):
-    return json.dumps(object)
-
-register.filter('jsonify', jsonify)

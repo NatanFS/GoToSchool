@@ -25,8 +25,12 @@ export const TableUsuarios = () => {
             getNewData(lastKey, data, type)
             downloadedPages +=1
         }
+        
     }, [data]) 
 
+    useEffect(() => {
+        setMessage(`Exibindo ${showingUsersNumber()} de ${totalUsers} Usuários`)
+    }, page)
     useEffect(() =>{
         if(downloadedPages == 3){
             downloadedPages = 0
@@ -50,7 +54,6 @@ export const TableUsuarios = () => {
         canNextPage,
         canPreviousPage,
         state,
-        pageOptions,
         prepareRow } = tableInstance
 
     const { pageIndex } = state
@@ -107,8 +110,6 @@ export const TableUsuarios = () => {
         setTotalUsers(totalUsers)
         setData(dataArr)
         setLoading(false)
-        setMessage(`Exibindo ${showingUsersNumber()} de ${totalUsers} Usuários`)
-        console.log("init")
     }
 
     function goToUser(row){
@@ -117,11 +118,13 @@ export const TableUsuarios = () => {
     }
 
     function showingUsersNumber() {
-        if(canNextPage){
-            return ((pageIndex*10) + 1) + " - " + (pageIndex+1)*10
+        if(!canPreviousPage){
+            return page.length
         } else {
-            return ((pageIndex*10) + 1) + " - " + totalUsers
+            var inicio = (pageIndex+1)*10 - 10
+            return inicio + " - " + (inicio+page.length) 
         }
+        
     }
 
     function visibilityButtonNext(){
@@ -130,6 +133,7 @@ export const TableUsuarios = () => {
         } else {
             return {"display":"none"}
         }
+       
     }
 
     function visibilityButtonPrevious(){
