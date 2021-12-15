@@ -420,9 +420,8 @@ def novidades_view(request):
             }
             
             dbRealtime.child(f"dados/novidades/{novidade_id}").set(novidade)
-    else:
-        novidadesSnapshot = dbRealtime.child(f"dados/novidades").get().val()
-        novidades = list(novidadesSnapshot.values())
+    novidadesSnapshot = dbRealtime.child(f"dados/novidades").get().val()
+    novidades = list(novidadesSnapshot.values())
         # novidadesList = list(novidadesDict.items())
         # novidades = np.array(novidadesList)
         # print(novidadesDict)
