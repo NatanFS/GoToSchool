@@ -53,7 +53,7 @@ class MotoristaForm(forms.Form):
 
 class NovidadeForm(forms.Form):
     titulo = forms.CharField(max_length=100, label="Título")
-    conteudo = forms.CharField(max_length=999, label="Conteúdo", widget=widgets.Textarea)
+    conteudo = forms.CharField(max_length=2000, label="Conteúdo", widget=widgets.Textarea)
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

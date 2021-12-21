@@ -48,7 +48,7 @@
                     quo : '"',
                 }[b];
             }).replaceAll("'", '"').replaceAll("&#x27;", '"').replaceAll('\n', "\\n");
-    
+    console.log(novidadesString)
     var novidadesHTML = ""
     const novidades = JSON.parse(novidadesString)
     novidades.forEach(novidade => {

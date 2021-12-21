@@ -2,6 +2,7 @@ import threading
 from time import time
 
 import numpy as np
+from oauth2client.client import GoogleCredentials
 from login.forms import *
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -25,7 +26,7 @@ from datetime import datetime
 from datetime import timedelta
 import re
 from threading import Thread
-
+from google.api_core.exceptions import NotFound
 
 
 print()
@@ -165,7 +166,10 @@ def answerReq(request):
     altConfirmadas = dbRealtime.child(f"dados/usuarios/{usuarioID}/altConfirmadas").get().val()
     if(status == 1):
         doc.update({'numConfirmadas': Increment(1)})
-        docUsuarioDados.update({"altConfirmadas": Increment(1)})
+        try:
+            docUsuarioDados.update({"altConfirmadas": Increment(1)})
+        except (NotFound):
+            docUsuarioDados.set({"altConfirmadas": 1})
         altDadosUsuario = docUsuarioDados.get().to_dict()
         altConfirmadas = altDadosUsuario["altConfirmadas"]
         message = f"{altConfirmadas} de suas requisições foram confirmadas."
@@ -174,7 +178,10 @@ def answerReq(request):
         reservarVaga(data)
     else:
         doc.update({'numNegadas': Increment(1)})
-        docUsuarioDados.update({"altNegadas": Increment(1)})
+        try:
+            docUsuarioDados.update({"altNegadas": Increment(1)})
+        except (NotFound):
+            docUsuarioDados.set({"altConfirmadas": 1})
         altDadosUsuario = docUsuarioDados.get().to_dict()
         altNegadas = altDadosUsuario["altNegadas"]
         message = f"{altNegadas} de suas requisições foram negadas."
@@ -309,9 +316,21 @@ def usuario_view(request, uid):
             usuario = {'nome': nome, 'cpf': cpf, 'email': email, 'turno': turno, "status": int(status),}
             status = int(dbRealtime.child(f"dados/usuarios/{uid}/status").get().val())
             if status == 0 and status != usuario["status"]:
-                docUsuarios.update({"aguardando": Increment(-1)})
+                    docUsuarios.update({"aguardando": Increment(-1)})
             elif usuario["status"] == 0 and not status == 0:
-                docUsuarios.update({"aguardando": Increment(1)})
+                    docUsuarios.update({"aguardando": Increment(1)})
+                
+            # if status == 0 and usuario["status"] == 1:
+                # Reservar vagas
+                # QUANTIDADE_DE_DIAS = 10
+                # locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8' )
+                # date = datetime.now() + timedelta(days=1)
+                # for i in range (QUANTIDADE_DE_DIAS):
+                #     if date.weekday() < 5:
+                #         dateText = date.strftime("%d de %B %Y")
+                        
+                #         dbRealtime.child(f"dados/dias/{dateText}/turnos/{onibus['turnoPadrao']}/onibusLista/{onibus['nome']}").update(onibus)
+                #     date += timedelta(days=1)
             dbRealtime.child(f"dados/usuarios/{uid}").update(usuario)
         else:
             messages.error(request, form.errors)
@@ -421,7 +440,12 @@ def novidades_view(request):
             
             dbRealtime.child(f"dados/novidades/{novidade_id}").set(novidade)
     novidadesSnapshot = dbRealtime.child(f"dados/novidades").get().val()
-    novidades = list(novidadesSnapshot.values())
+    if novidadesSnapshot:
+        novidades = list(novidadesSnapshot.values())
+        novidades.sort(key=lambda novidade: novidade['timeInMilis'], reverse=True)
+    else:
+        novidades = None
+    
         # novidadesList = list(novidadesDict.items())
         # novidades = np.array(novidadesList)
         # print(novidadesDict)
