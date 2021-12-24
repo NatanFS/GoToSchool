@@ -16,10 +16,15 @@ def firstAndLast(value):
     arr = value.split()
     return arr[0] + " " + arr[-1]
 
+def first(value):
+    arr = value.split()
+    return arr[0]
+
 def removeSpace(value):
     nValue = value.replace(" ", "-")
     return nValue
 
 register.filter('getNome', getNome)
+register.filter('first', first)
 register.filter('firstAndLast', firstAndLast)
 register.filter('removeSpace', removeSpace)

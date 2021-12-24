@@ -5,95 +5,20 @@
 {% endblock %}
 
 {% block body %}
+
 <div class="logo mb-3">
   <div class="card bg-dark text-white">
-    <img class="crop-image" src="{% static 'login/img/traffic2.jpg' %}" class="card-img" alt="..." height="400px">
+    <img class="crop-image" src="{% static 'login/img/traffic2.jpg' %}" class="card-img" alt="..." height="350px">
     <div class="card-img-overlay">
-      <h5 class="card-title">Bem-vindo de volta, Natan!</h5>
-      <p class="card-text">Você pode checar abaixo as pendências do sistema:</p>
+      <h5 class="card-title">Bem-vindo de volta, {{user.first_name}}!</h5>
+      <p class="card-text">Você pode checar as pendências do sistema abaixo:</p>
   
     </div>
   </div>
 </div>
 
-<div class="container">
-    <div class="row mb-3">
-        <div class="container-card col"> 
-          <a href="{% url 'usuarios'%}" class="card text-center ">
-                <div class="card-header">
-                  Usuários
-                </div>
-                
-                <div class="card-body">
-                  <div>
-                    <h3 class="laranja">{{nUsuariosPendentes}}</h3>
-                    <p class="text-muted text-uppercase small">Aguardando confirmação</p>
-                    <hr>
-                  </div>
-                  <div>
-                    <h3 class="verde">{{nUsuariosConfirmados}}</h3>
-                    <p class="text-muted text-uppercase small">Habilitados</p>
-                    <hr>
-                  </div>
-                 <div>
-                    <h3 class="vermelho">{{nUsuariosNegados}}</h3>
-                    <p class="text-muted text-uppercase small">Desabilitados</p>
-                    <hr>
-                 </div>
-                  <div>
-                    <h3 class="">{{nUsuarios}}</h3>
-                    <p class="text-muted text-uppercase small">Total</p>
-                    <hr>
-                  </div>
-                </div>
-              </a>
-        </div>
-
-        <div class="container-card col"> 
-            <a href="{% url 'requisicoes' %}" class="card text-center">
-                <div class="card-header">
-                  Requisições
-                </div>
-                <div class="card-body">
-                  <div>
-                    <h3 class="laranja">{{nRequisicoesPendentes}}</h3>
-                    <p class="text-muted text-uppercase small">Pendentes</p>
-                    <hr>
-                  </div>
-                  <div>
-                    <h3 class="verde">{{nRequisicoesConfirmadas}}</h3>
-                    <p class="text-muted text-uppercase small">Confirmadas</p>
-                    <hr>
-                  </div>
-                 <div>
-                    <h3 class="vermelho">{{nRequisicoesNegadas}}</h3>
-                    <p class="text-muted text-uppercase small">Negadas</p>
-                    <hr>
-                 </div>
-                 <div>
-                  <h3 class="">{{nRequisicoes}}</h3>
-                  <p class="text-muted text-uppercase small">Total</p>
-                  <hr>
-                </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="container-card col"> 
-              <a href="{% url 'onibus'%}" class="card text-center">
-                <div class="card-header">
-                  Ônibus
-                </div>
-                <div class="card-body">
-                  <div>
-                    <h3 class="">{{nOnibus}}</h3>
-                    <p class="text-muted text-uppercase small">Total</p>
-                    <hr>
-                 </div>
-                </div>
-              </a>
-        </div> 
-    </div>
+<div class="container-fluid dashboard">
+  
 
     <div class="row mb-3">
         <div class="col-sm-6 mb-3">
@@ -130,9 +55,88 @@
           </a>
         </div>
     </div>
+
+    <div class="row mb-3">
+      <div class="container-card col"> 
+        <a href="{% url 'usuarios'%}" class="card text-center ">
+              <div class="card-header">
+                Usuários
+              </div>
+              
+              <div class="card-body">
+                <div>
+                  <h3 class="laranja">{{nUsuariosPendentes}}</h3>
+                  <p class="text-muted text-uppercase small">Aguardando confirmação</p>
+                  <hr>
+                </div>
+                <div>
+                  <h3 class="verde">{{nUsuariosConfirmados}}</h3>
+                  <p class="text-muted text-uppercase small">Habilitados</p>
+                  <hr>
+                </div>
+               <div>
+                  <h3 class="vermelho">{{nUsuariosNegados}}</h3>
+                  <p class="text-muted text-uppercase small">Desabilitados</p>
+                  <hr>
+               </div>
+                <div>
+                  <h3 class="">{{nUsuarios}}</h3>
+                  <p class="text-muted text-uppercase small">Total</p>
+                  <hr>
+                </div>
+              </div>
+            </a>
+      </div>
+
+      <div class="container-card col"> 
+          <a href="{% url 'requisicoes' %}" class="card text-center">
+              <div class="card-header">
+                Requisições
+              </div>
+              <div class="card-body">
+                <div>
+                  <h3 class="laranja">{{nRequisicoesPendentes}}</h3>
+                  <p class="text-muted text-uppercase small">Pendentes</p>
+                  <hr>
+                </div>
+                <div>
+                  <h3 class="verde">{{nRequisicoesConfirmadas}}</h3>
+                  <p class="text-muted text-uppercase small">Confirmadas</p>
+                  <hr>
+                </div>
+               <div>
+                  <h3 class="vermelho">{{nRequisicoesNegadas}}</h3>
+                  <p class="text-muted text-uppercase small">Negadas</p>
+                  <hr>
+               </div>
+               <div>
+                <h3 class="">{{nRequisicoes}}</h3>
+                <p class="text-muted text-uppercase small">Total</p>
+                <hr>
+              </div>
+              </div>
+          </a>
+      </div>
+
+      <div class="container-card col"> 
+            <a href="{% url 'onibus'%}" class="card text-center">
+              <div class="card-header">
+                Ônibus
+              </div>
+              <div class="card-body">
+                <div>
+                  <h3 class="">{{nOnibus}}</h3>
+                  <p class="text-muted text-uppercase small">Total</p>
+                  <hr>
+               </div>
+              </div>
+            </a>
+      </div> 
+  </div>
+
     </div>
 
-    <div class="row">
+    
      
 </div>
 {% endblock %}

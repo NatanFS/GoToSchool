@@ -6,6 +6,16 @@ h1{
 .body_content{
     overflow-y: auto;
 }
+
+.logo{
+    max-width: 1900px;
+    margin: auto;
+}
+
+.dashboard{
+    max-width: 1500px;
+    margin: auto;
+}
 .crop-image{
     filter: brightness(70%);
     object-fit: cover;
