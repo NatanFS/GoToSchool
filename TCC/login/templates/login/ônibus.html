@@ -12,12 +12,16 @@
 
 
 <div class="container-fluid content">
-    <div class="row card-row">
-        <div class="onibus-lista-container col-12 col-sm-5">
-            {% for onibus in onibusLista %}
+    <div class="row">
+        <div class="card onibus-lista-container col-12 col-sm-5 m-2">
+            <div class="card-header text-center">
+                Lista de Ônibus
+            </div>
+            <div class="card-body">
+                {% for onibus in onibusLista %}
                 <div class=" " href="#" onclick='selectOnibus("{{onibus}}")' >
                     
-                    <div class="card mb-3 mx-auto" style="max-width: 540px;">
+                    <div class="card mb-3 mx-auto" style="max-width: 600px;">
                         <div class="dropdown" id="dropdown-{{onibus.nome|removeSpace}}" >
                             <a class="dropdown-btn" onclick='dropdown("{{onibus.nome|removeSpace}}")'>
                                 <i class="fas fa-ellipsis-v menu-aviso"></i>
@@ -81,61 +85,71 @@
                 </div>
             </div>
             {% endfor %}
+            </div>
         </div>
+
+        <div class="card card col m-2">
+            <div class="card-header text-center">
+              Formulário
+            </div>
+            <div class="card-body">
+                <form method="POST" class="">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    
+                        {% for error in field.errors %}
+                        <div class="error-messages text-danger">
+                            {{ error }}
+                        </div> 
+                        {%endfor%}
+                        <div class="form-group">
+                            {{field.label_tag}}
+                            {{field}}
+                        </div>
+                    {% endfor %}
+                
+                    <label for="idaSaida"> Horário de saída do ônibus  (Viagem de ida)</label>
+                    <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
+                        <input type="text" class="form-control" name="idaSaida" value="00:00">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-time"></span>
+                        </span>
+                    </div>
+                    <label for="idaChegada"> Horário de chegada ônibus (Viagem de ida) </label>
+                    <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
+                        <input type="text" class="form-control" name="idaChegada" value="00:00">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-time"></span>
+                        </span>
+                    </div>
+                    <label for="retornoSaida"> Horário de saída do ônibus (Retorno)</label>
+                    <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
+                        <input type="text" class="form-control" name="retornoSaida" value="00:00">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-time"></span>
+                        </span>
+                    </div>
+                    <label for="retornoChegada"> Horário de chegada ônibus (Retorno)</label>
+                    <div class="input-group clockpicker" data-placement="top" data-align="left" data-autoclose="true">
+                        <input type="text" class="form-control" name="retornoChegada" value="00:00">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-time"></span>
+                        </span>
+                    </div>
+                
+                    <div class="row pt-3">
+                        <div class="col-6 d-grid">
+                            <button id="limpar" type="button" class="btn btn-danger">Limpar</button>
+                        </div>
+                        <div class="col-6 d-grid">
+                            <button id="adicionar" type="submit" class="btn btn-primary">Adicionar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+          </div>
     
-        <form method="POST" class="col-12 col-sm-7 form">
-            {% csrf_token %}
-            {% for field in form %}
-            
-                {% for error in field.errors %}
-                <div class="error-messages text-danger">
-                    {{ error }}
-                </div> 
-                {%endfor%}
-                <div class="form-group">
-                    {{field.label_tag}}
-                    {{field}}
-                </div>
-            {% endfor %}
         
-            <label for="idaSaida"> Horário de saída do ônibus  (Viagem de ida)</label>
-            <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
-                <input type="text" class="form-control" name="idaSaida" value="00:00">
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-time"></span>
-                </span>
-            </div>
-            <label for="idaChegada"> Horário de chegada ônibus (Viagem de ida) </label>
-            <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
-                <input type="text" class="form-control" name="idaChegada" value="00:00">
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-time"></span>
-                </span>
-            </div>
-            <label for="retornoSaida"> Horário de saída do ônibus (Retorno)</label>
-            <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
-                <input type="text" class="form-control" name="retornoSaida" value="00:00">
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-time"></span>
-                </span>
-            </div>
-            <label for="retornoChegada"> Horário de chegada ônibus (Retorno)</label>
-            <div class="input-group clockpicker" data-placement="top" data-align="left" data-autoclose="true">
-                <input type="text" class="form-control" name="retornoChegada" value="00:00">
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-time"></span>
-                </span>
-            </div>
-        
-            <div class="row pt-3">
-                <div class="col-6 d-grid">
-                    <button id="limpar" type="button" class="btn btn-danger">Limpar</button>
-                </div>
-                <div class="col-6 d-grid">
-                    <button id="adicionar" type="submit" class="btn btn-primary">Adicionar</button>
-                </div>
-            </div>
-        </form>
     </div>
 </div>
 

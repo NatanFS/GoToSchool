@@ -10,28 +10,38 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="novidades-container col-12 col-sm-5 m-2">
+        <div class="card novidades-container col-12 col-sm-5 m-2">
         </div>
-        <form method="POST" class="col" id="editar-dados-usuario">
-            {% csrf_token %}
-            {% for field in form %}
-            
-                {% for error in field.errors %}
-                <div class="error-messages text-danger">
-                    {{ error }}
-                </div> 
-                {%endfor%}
-                <div class="form-group">
-                    {{field.label_tag}}
-                    {{field}}
-                </div>
-            {% endfor %}
-            <div class="row ">
-                <div class="col d-flex justify-content-end p-3">
-                    <button type="submit" class="btn btn-primary">Adicionar</button>
-                </div>
+
+        <div class="card col m-2">
+            <div class="card-header text-center">
+              Adicionar novidade
             </div>
-        </form>
+            <div class="card-body ">
+                <form method="POST" class="" id="editar-dados-usuario">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    
+                        {% for error in field.errors %}
+                        <div class="error-messages text-danger">
+                            {{ error }}
+                        </div> 
+                        {%endfor%}
+                        <div class="form-group">
+                            {{field.label_tag}}
+                            {{field}}
+                        </div>
+                    {% endfor %}
+                    <div class="row flex-row justify-content-end">
+                        <div class="col-12 col-sm-12 col-md-6 d-grid mt-3">
+                            <button type="submit" class="btn btn-primary">Adicionar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+          </div>
+
+        
     </div>
 </div>
 
@@ -49,15 +59,20 @@
                 }[b];
             }).replaceAll("'", '"').replaceAll("&#x27;", '"').replaceAll('\n', "\\n");
     console.log(novidadesString)
-    var novidadesHTML = ""
+    var novidadesHTML = `<div class="card-header">Lista de Avisos </div>
+                            <div class="card-body">`
     const novidades = JSON.parse(novidadesString)
     novidades.forEach(novidade => {
-        novidadesHTML += `<div class="novidade">
-                                <div class="titulo text-center">${novidade.titulo}:</div>
-                                <div class="body">${novidade.conteudo}</div>
-                                <hr>
-                          </div>`
+        novidadesHTML += `
+                            
+                                <div class="novidade">
+                                    <div class="titulo text-center">${novidade.titulo}:</div>
+                                    <div class="body">${novidade.conteudo}</div>
+                                    <hr>
+                                </div>`
     });
+
+    novidadesHTML += `</div>`
 
     novidadesContainer.innerHTML = novidadesHTML
  
