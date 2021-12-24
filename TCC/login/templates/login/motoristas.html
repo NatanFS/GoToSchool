@@ -6,25 +6,48 @@
 
 {% block body %}
 
-<form method="POST" class="col-xs-12 col-sm-8 col-md-10" id="editar-dados-usuario">
-    {% csrf_token %}
-    {% for field in form %}
-    
-        {% for error in field.errors %}
-        <div class="error-messages text-danger">
-            {{ error }}
-        </div> 
-        {%endfor%}
-        <div class="form-group">
-            {{field.label_tag}}
-            {{field}}
+{% if messages %}
+    <div class="messages" data-dismiss="alert" style="text-align:center;">
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        <div class="alert alert-success success" role="alert">
+            {{ message }}
         </div>
-    {% endfor %}
-    <div class="row ">
-        <div class="col d-flex justify-content-end p-3">
-            <button type="submit" class="btn btn-primary">Adicionar</button>
+        {% elif message.tags == 'warning' %}
+        <div class="alert alert-warning" role="alert">
+            {{ message }}
         </div>
+        {% elif message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+        {% endif %}
+        {% endfor %}
     </div>
-</form>
+{% endif %}
+
+<div class="container form-container col-sm-12 col-md-8 col-xl-6 mx-auto">
+    <form method="POST" class="col-xs-12 col-sm-8 col-md-10" id="editar-dados-usuario">
+        {% csrf_token %}
+        {% for field in form %}
+        
+            {% for error in field.errors %}
+            <div class="error-messages text-danger">
+                {{ error }}
+            </div> 
+            {%endfor%}
+            <div class="form-group">
+                {{field.label_tag}}
+                {{field}}
+            </div>
+        {% endfor %}
+       
+        <div class="row ">
+            <div class="col d-grid pt-3">
+                <button type="submit" class="btn btn-primary">Adicionar</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 {% endblock %}

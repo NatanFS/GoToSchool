@@ -3,8 +3,42 @@ h1{
     margin-left: 20px!important;
 }
 
-h3{
-    padding-bottom: 200px;
+.body_content{
+    overflow-y: auto;
+}
+.crop-image{
+    filter: brightness(70%);
+    object-fit: cover;
+}
+
+.card{
+    text-decoration: none;
+    color: black;
+}
+
+.card-bx{
+    font-size: 100px;
+    color: #070746;
+}
+
+.verde{
+    color: green;
+}
+
+.vermelho{
+    color:red;
+}
+
+.amarelo{
+    color:black;
+}
+
+.laranja{
+    color: orange;
+}
+
+.card:hover{
+    text-decoration: none;
     color: black;
 }
 

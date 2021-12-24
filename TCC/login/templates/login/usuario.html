@@ -15,8 +15,6 @@
         </div>
     
 
-    
-
     <form method="POST" class="col-xs-12 col-sm-8 col-md-8" id="editar-dados-usuario">
         {% csrf_token %}
         {% for field in form %}
@@ -39,14 +37,14 @@
     </form>
 </div>
 
-<div class="row container-fluid container-matricula">
+<div class="row container-fluid container-matricula active">
     <div class="col-12 matricula-header">
         <h3 style="vertical-align: middle;">
-            <i id="icon-show" class="fas fa-chevron-right" style="font-size: 16px ; margin-left: 5px; color: gray; vertical-align: middle;"></i>
+            <i id="icon-show" class="fas fa-chevron-down" style="font-size: 16px ; margin-left: 5px; color: gray; vertical-align: middle;"></i>
             Matrícula</h3>
             <hr>
     </div>
-    <div class="container-pdf">
+    <div class="container-pdf active">
         <embed src="{{urlPDF}}" type="application/pdf" height="100%" width="100%" class="pdf">
     </div>
 </div>

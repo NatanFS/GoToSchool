@@ -1,8 +1,10 @@
 import threading
 from time import time
+from django.http import response
 
 import numpy as np
 from oauth2client.client import GoogleCredentials
+from pyasn1.type import base
 from login.forms import *
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -27,6 +29,8 @@ from datetime import timedelta
 import re
 from threading import Thread
 from google.api_core.exceptions import NotFound
+from requests.exceptions import HTTPError
+import base64
 
 
 print()
@@ -49,9 +53,11 @@ firebase_admin.initialize_app(cred)
 firebase = initialize_firebase()
 dbRealtime = firebase.database()
 dbFirestore = firestore.client()
+storage = firebase.storage()
 collection = dbFirestore.collection('dados')
 doc = collection.document('requisicoesDados')
-
+onibusDoc = collection.document('onibus')
+auth = firebase.auth()
 # Essa thread poderá ser usada para fazer a criação automática dos dias na parte do servidor
 
 # def timer():
@@ -88,7 +94,32 @@ def index(request):
     if user.is_anonymous:
         return HttpResponseRedirect(reverse("login"))
     else:
-        return render(request, 'login/index.html', {"user": user, "title": "Home"})
+        requisicoesDados = doc.get().to_dict()
+        onibusDados =  onibusDoc.get().to_dict()
+        dados_usuarios = dbFirestore.document("dados/usuarios").get().to_dict()
+        nUsuarios = dados_usuarios["numero"]
+        nUsuariosPendentes = dados_usuarios["aguardando"]
+        nUsuariosConfirmados = dados_usuarios["confirmados"]
+        nUsuariosNegados = dados_usuarios["negados"]
+        nRequisicoesPendentes = requisicoesDados["numPendentes"]
+        nRequisicoesConfirmadas = requisicoesDados["numConfirmadas"]
+        nRequisicoesNegadas = requisicoesDados["numNegadas"]
+        nOnibus = onibusDados["numero"]
+        
+        context = {"nUsuarios": nUsuarios, 
+                   "nUsuariosPendentes": nUsuariosPendentes,
+                   "nUsuariosConfirmados": nUsuariosConfirmados,
+                   "nUsuariosNegados": nUsuariosNegados,
+                   "nRequisicoesPendentes": nRequisicoesPendentes,
+                   "nRequisicoesConfirmadas": nRequisicoesConfirmadas,
+                   "nRequisicoesNegadas": nRequisicoesNegadas,
+                   "nUsuarios": nUsuarios,
+                   "nRequisicoes": nRequisicoesConfirmadas + nRequisicoesNegadas + nRequisicoesPendentes,
+                   "nOnibus": nOnibus,
+                   "user": user,
+                   "title": "GoToSchool"}
+        
+        return render(request, 'login/index.html', context)
     
 def logout_view(request):
     logout(request)
@@ -172,9 +203,12 @@ def answerReq(request):
             docUsuarioDados.set({"altConfirmadas": 1})
         altDadosUsuario = docUsuarioDados.get().to_dict()
         altConfirmadas = altDadosUsuario["altConfirmadas"]
-        message = f"{altConfirmadas} de suas requisições foram confirmadas."
+        if altConfirmadas > 1:
+            message = f"{altConfirmadas} de suas requisições foram confirmadas."
+        else:
+            message = f"{altConfirmadas} de suas requisições foi confirmada."
         dataNotification["status"] = 1
-        dataNotification["title"] = "Confirmadas"
+        dataNotification["title"] = "Requisições confirmadas"
         reservarVaga(data)
     else:
         doc.update({'numNegadas': Increment(1)})
@@ -184,12 +218,15 @@ def answerReq(request):
             docUsuarioDados.set({"altConfirmadas": 1})
         altDadosUsuario = docUsuarioDados.get().to_dict()
         altNegadas = altDadosUsuario["altNegadas"]
-        message = f"{altNegadas} de suas requisições foram negadas."
+        if altNegadas > 1:
+            message = f"{altNegadas} de suas requisições foram negadas."
+        else:
+             message = f"{altNegadas} de suas requisições foi negada."
         dataNotification["status"] = 0
-        dataNotification["title"] = "Negadas"
+        dataNotification["title"] = "Requisições negadas"
     
     dataNotification["message"] = message
-    dataNotification["title"] = "Requisições"
+
     enviarNotificacao(token, dataNotification)
     return JsonResponse({"message": "Requisição respondida com sucesso."}, status=201)
 
@@ -315,11 +352,32 @@ def usuario_view(request, uid):
             docUsuarios = dbFirestore.document("dados/usuarios")
             usuario = {'nome': nome, 'cpf': cpf, 'email': email, 'turno': turno, "status": int(status),}
             status = int(dbRealtime.child(f"dados/usuarios/{uid}/status").get().val())
-            if status == 0 and status != usuario["status"]:
-                    docUsuarios.update({"aguardando": Increment(-1)})
-            elif usuario["status"] == 0 and not status == 0:
-                    docUsuarios.update({"aguardando": Increment(1)})
-                
+            if status == 0 and usuario["status"] == 1:
+                docUsuarios.update({"aguardando": Increment(-1)})
+                docUsuarios.update({"confirmados": Increment(1)})
+            if status == 0 and usuario["status"] == -1:
+                docUsuarios.update({"aguardando": Increment(-1)})
+                docUsuarios.update({"negados": Increment(1)})
+            if status == 1 and usuario["status"] == -1:
+                docUsuarios.update({"confirmados": Increment(-1)})
+                docUsuarios.update({"negados": Increment(1)})
+            if status == -1 and usuario["status"] == 1:
+                docUsuarios.update({"confirmados": Increment(1)})
+                docUsuarios.update({"negados": Increment(-1)})       
+        
+            notificacao = {}
+            notificacao["status"] = 2
+            if status != usuario["status"]:
+                if usuario["status"] == 1:
+                    # Cadastro confirmado
+                    notificacao["title"] = "Cadastro confirmado!"
+                    notificacao["message"] = f"Parabéns, {usuario['nome']}! O seu cadastro no sistema GoToSchool foi aprovado! Você agora pode começar a fazer as suas reservas."
+                if usuario["status"] == -1:
+                    # Cadastro negado
+                    notificacao["title"] = "Cadastro negado."
+                    notificacao["message"] = f"Olá, {usuario['nome']}, o seu cadastro foi negado. Por favor, entre no aplicativo para mais informações."
+                token = dbRealtime.child(f"dados/usuarios/{uid}/token").get().val()        
+                enviarNotificacao(token, notificacao)
             # if status == 0 and usuario["status"] == 1:
                 # Reservar vagas
                 # QUANTIDADE_DE_DIAS = 10
@@ -342,7 +400,7 @@ def usuario_view(request, uid):
     form.fields['email'].initial = usuario["email"]
     form.fields['turno'].initial = usuario["turno"]
     form.fields['status'].initial = usuario["status"]
-    
+    form.fields['tipo'].initial = usuario["tipo"]
     context = {"title": usuario['nome'], "fotoURL": usuario["urlFoto"], "urlPDF": usuario["urlPDF"],  "nome": usuario["nome"], "form": form}
     return render(request, "login/usuario.html", context)
     
@@ -372,7 +430,8 @@ def avisos_view(request):
         
     avisosSnapshot = dbRealtime.child(f"dados/avisos").get().val()
     avisos = []
-    for key, aviso in avisosSnapshot.items():
+    if avisosSnapshot != None:
+     for key, aviso in avisosSnapshot.items():
         usuario = dbRealtime.child(f"dados/usuarios/{aviso['idUsuario']}").get().val()
         aviso['usuario'] = usuario
         comentarios = aviso.get('comentarios')
@@ -419,11 +478,69 @@ def removerAviso(request, idAviso):
         return HttpResponseForbidden()
     
 
+
 @login_required    
 def motoristas_view(request):
-    if request.method == "GET":
+    if request.method == "POST":
+        form = MotoristaForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+           
+            senha1 = data["senha1"]
+            senha2 = data["senha2"]
+            nome = data["nome"]
+            cpf = data["cpf"]
+            email = data["email"]
+            emailB64 = base64.b64encode(email.encode('ascii')).decode("utf-8")
+            idMotorista = re.sub("//n|//r", "", str(emailB64)).replace("\n", "")
+            message = None
+            if senha1 == senha2:
+                try:
+                    auth.create_user_with_email_and_password(email, senha1)
+                except HTTPError as e:
+                    exception = json.loads(e.strerror)
+                    message = exception["error"]["message"]
+            else:
+                message = "As senhas não coincidem."
+            
+            if message:
+                messages.error(request, message)
+            else:
+                messages.success(request, "Cadastro realizado com sucesso!")
+                form = MotoristaForm()
+                
+            # foto = request.FILES.get("imagem", None)
+            # documento = request.FILES.get("documento", None)
+            # print(foto)
+            # print(documento)
+            # print(type(foto))
+            # print(type(documento))
+            # fotoReference = storage.child(f"imagens/perfil/{idMotorista}.jpeg")
+            # documentoReference = storage.child(f"arquivos/licenças/{idMotorista}.pdf")
+            # fotoReference.put(foto)
+            # documentoReference.put(documento)
+            # urlFoto = fotoReference.get_url()
+            # urlDocumento = documentoReference.get_url()
+            # print(urlFoto)
+            # print(urlDocumento)
+            motorista = {
+                "nome": nome,
+                "cpf": cpf,
+                "email": email,
+                "idInstituicao": "GoToSchool",
+                "idUsuario": idMotorista,
+                "status": 1,
+                "tipo": "motorista",
+                "turno": data["turno"],
+                "urlFoto": "https://firebasestorage.googleapis.com/v0/b/projetointegrador-7141d.appspot.com/o/imagens%2Fperfil%2FdXN1YXJpb2V4ZW1wbG9AZ21haWwuY29t.jpeg?alt=media&token=051e34d5-8708-4702-b3f4-15a5cfe4f957",
+                "urlPDF": " ",
+            }
+            dbRealtime.child(f"dados/usuarios/{idMotorista}").set(motorista)
+    else:
         form = MotoristaForm()
-        return render(request, "login/motoristas.html" , {'title': "Gerenciar motoristas",  "form": form})
+    return render(request, "login/motoristas.html" , {'title': "Cadastrar motoristas",  "form": form})
+
+    
 
 @login_required    
 def novidades_view(request):
@@ -471,13 +588,13 @@ def onibus_view(request):
                 "placa": data["placa"],
                 "turnoPadrao": data["turno"],
                 "vagasTotal": data["capacidade"],
-                "vagasOcupadas": 0,
-                "vagasDisponiveis": data["capacidade"],
+                # "vagasOcupadas": 0,
+                # "vagasDisponiveis": data["capacidade"],
                 "horarioIdaSaida": request.POST["idaSaida"] + " h",
                 "horarioIdaChegada": request.POST["idaChegada"] + " h",
                 "horarioVoltaSaida": request.POST["retornoSaida"] + " h",
                 "horarioVoltaChegada": request.POST["retornoChegada"] + " h",
-                "onibusTurnoID": PushID().next_id()
+                # "onibusTurnoID": PushID().next_id()
             }
             print(onibus)
             # Tornar ônibus disponível para os próximos dias.
@@ -490,8 +607,10 @@ def onibus_view(request):
                     onibus["data"] = dateText
                     dbRealtime.child(f"dados/dias/{dateText}/turnos/{onibus['turnoPadrao']}/onibusLista/{onibus['nome']}").update(onibus)
                 date += timedelta(days=1)
-            
             dbRealtime.child(f"dados/onibuslista/{onibus['nome']}").update(onibus)
+            onibusIDS = dbRealtime.child("dados/onibuslista").shallow().get().val()
+            total = len(onibusIDS)
+            onibusDoc.set({"numero": total})
         else:    
             return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form, "onibusLista": onibusLista})
     
@@ -504,6 +623,31 @@ def onibus_view(request):
     form = OnibusForm()
     return render(request, "login/ônibus.html" , {'title': "Gerenciar ônibus", "form": form, "onibusLista": onibusLista})
 
+@login_required 
+@csrf_exempt
+def removerOnibus(request):
+    
+    if request.user.is_superuser and request.method == "POST":
+        data = json.loads(request.body)
+        nome = data.get("onibus", "")
+        print(nome)
+        QUANTIDADE_DE_DIAS = 10
+        locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8' )
+        date = datetime.now() + timedelta(days=1)
+        onibus = dbRealtime.child(f"dados/onibuslista/{nome}").get().val()
+        for i in range (QUANTIDADE_DE_DIAS):
+            if date.weekday() < 5:
+                dateText = date.strftime("%d de %B %Y")
+                onibus["data"] = dateText
+                dbRealtime.child(f"dados/dias/{dateText}/turnos/{onibus['turnoPadrao']}/onibusLista/{onibus['nome']}").remove()
+            date += timedelta(days=1)
+        
+        dbRealtime.child(f"dados/onibuslista/{onibus['nome']}").remove()
+        onibusDoc.update({"numero": Increment(-1)})
+        return JsonResponse({'message': 'Aviso removido'}, safe=False)
+    else:
+        return HttpResponseForbidden()
+    
 @csrf_exempt
 @login_required
 def comentarAviso(request, idAviso):

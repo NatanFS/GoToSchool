@@ -23,21 +23,22 @@
 {% endif %}
 
 <link rel="stylesheet" href="{% static 'login/css/cadastro.css' %}">
-<div class="form-container container col-sm-12 col-md-8 col-xl-6 mx-auto text-center">
-    <h4>Formulário de cadastro</h4>
+<div class="form-container container col-sm-12 col-md-8 col-xl-6 mx-auto ">
     <form method="POST">
         {% csrf_token %}
-            {% for field in form %}
-            <div class="fieldWrapper">
-                <div class="error-messages">
-                    {{ field.errors }}
-                </div>
-                 <div class="form-group">
-                    {{ field }}
-                 </div>
-            </div>
-            {% endfor %}
-     
+        
+        {% for field in form %}
+        
+        {% for error in field.errors %}
+        <div class="error-messages text-danger">
+            {{ error }}
+        </div> 
+        {%endfor%}
+        <div class="form-group">
+            {{field.label_tag}}
+            {{field}}
+        </div>
+    {% endfor %}
         <div class="d-grid gap-2 ">
             <input class="btn btn-primary " type="submit" value="Cadastrar">
         </div>

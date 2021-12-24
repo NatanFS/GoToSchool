@@ -13,6 +13,7 @@ urlpatterns = [
     path('avisos/comentar/<str:idAviso>', views.comentarAviso, name=("comentar-aviso")),
     path('novidades', views.novidades_view, name=("novidades")),
     path('onibus', views.onibus_view, name=("onibus")),
+    path('onibus/remover', views.removerOnibus, name=("remover-onibus")),
     path('ouvidoria', views.ouvidoria_view, name=("ouvidoria")),
     path('motoristas', views.motoristas_view, name=("motoristas")),
     path('API/usuarios', views.get_usuarios, name=("getUsuarios")),
