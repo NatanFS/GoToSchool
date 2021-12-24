@@ -9,13 +9,15 @@ from login.forms import *
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 import firebase_admin
+from firebase_admin import credentials, firestore
 from .util import initialize_firebase, recuperarOnibus, time_until_end_of_day
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 import json
-from firebase_admin import credentials, firestore
+
+from google.cloud import firestore
 from pyfcm import FCMNotification
 from django.views.generic import CreateView
 from google.cloud.firestore_v1 import Increment
@@ -31,9 +33,10 @@ from threading import Thread
 from google.api_core.exceptions import NotFound
 from requests.exceptions import HTTPError
 import base64
-
+import pyrebase
 
 print()
+import os
 
 credentials_google = {
     "type": "service_account",
@@ -46,17 +49,30 @@ credentials_google = {
     "token_uri": "https://oauth2.googleapis.com/token",
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-6vsr7%40projetointegrador-7141d.iam.gserviceaccount.com"
+}
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'TCC/credentials.json'
+
+config = {
+        "apiKey": "AIzaSyCN-I4MtBOmEZh-UA0-wUaEaGb9aSfEqcA",
+        "authDomain": "projetointegrador-7141d.firebaseapp.com",
+        "databaseURL": "https://projetointegrador-7141d.firebaseio.com",
+        "projectId": "projetointegrador-7141d",
+        "storageBucket": "projetointegrador-7141d.appspot.com",
+        "messagingSenderId": "173544521842",
+        "appId": "1:173544521842:web:1f85ddf0d5dd23334182eb",
+        "serviceAccount": credentials_google
     }
 
-cred = credentials.Certificate(credentials_google)
-firebase_admin.initialize_app(cred)
-firebase = initialize_firebase()
+firebase = pyrebase.initialize_app(config)
 dbRealtime = firebase.database()
-dbFirestore = firestore.client()
+dbFirestore = firestore.Client()
 storage = firebase.storage()
 collection = dbFirestore.collection('dados')
 doc = collection.document('requisicoesDados')
 onibusDoc = collection.document('onibus')
+
+
 auth = firebase.auth()
 # Essa thread poderá ser usada para fazer a criação automática dos dias na parte do servidor
 
@@ -258,7 +274,7 @@ def reservarVaga(data):
 
 
 class CadastrarStaff(SuperuserRequiredMixin, CreateView):
-    model = User
+    model = Usuario
     form_class = CadastrarStaffForm
     template_name = 'login/cadastro-staff.html'
     extra_context = {"title": "Cadastrar administradores."}   

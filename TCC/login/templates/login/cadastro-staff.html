@@ -1,49 +1,33 @@
-{% extends 'login/layout.html' %}
-{% load static %}
-{% block body %}
+{% extends 'login/layout2.html' %}
 
-{% if messages %}
-    <div class="messages" data-dismiss="alert" style="text-align:center;">
-        {% for message in messages %}
-        {% if message.tags == 'success' %}
-        <div class="alert alert-success success" role="alert">
-            {{ message }}
-        </div>
-        {% elif message.tags == 'warning' %}
-        <div class="alert alert-warning" role="alert">
-            {{ message }}
-        </div>
-        {% elif message.tags == 'error' %}
-        <div class="alert alert-danger" role="alert">
-            {{ message }}
-        </div>
-        {% endif %}
-        {% endfor %}
+{% block document_title %}
+Cadastrar Administradores
+{% endblock %}
+
+{% block title %}
+Cadastrar Administradores
+{% endblock %}
+{% block form %}
+<form class="mb-3" method="POST">
+    {% csrf_token %}
+
+    {% for field in form %}
+
+    {% for error in field.errors %}
+    <div class="error-messages text-danger">
+        {{ error }}
     </div>
-{% endif %}
-
-<link rel="stylesheet" href="{% static 'login/css/cadastro.css' %}">
-<div class="form-container container col-sm-12 col-md-8 col-xl-6 mx-auto ">
-    <form method="POST">
-        {% csrf_token %}
-        
-        {% for field in form %}
-        
-        {% for error in field.errors %}
-        <div class="error-messages text-danger">
-            {{ error }}
-        </div> 
-        {%endfor%}
-        <div class="form-group">
-            {{field.label_tag}}
-            {{field}}
-        </div>
+    {%endfor%}
+    <div class="form-group">
+        {{field.label_tag}}
+        {{field}}
+    </div>
     {% endfor %}
-        <div class="d-grid gap-2 ">
-            <input class="btn btn-primary " type="submit" value="Cadastrar">
+    <div class="row ">
+        <div class="col d-grid pt-3">
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
         </div>
-        
-    </form>
-    
-</div>
+    </div>
+
+</form>
 {% endblock %}

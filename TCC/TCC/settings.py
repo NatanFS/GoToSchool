@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cpf_field',
 ]
 
 MIDDLEWARE = [
@@ -116,7 +116,7 @@ GOOGLE_APPLICATION_CREDENTIALS = {
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-AUTH_USER_MODEL = 'login.User'
+AUTH_USER_MODEL = 'login.Usuario'
 
 LANGUAGE_CODE = 'pt-br'
 

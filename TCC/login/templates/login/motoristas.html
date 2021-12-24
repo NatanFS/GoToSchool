@@ -1,53 +1,35 @@
-{% extends "login/layout.html" %}
-{% load static %}
-{% block head %}
+{% extends 'login/layout2.html' %}
 
+{% block document_title %}
+Cadastrar Motoristas
 {% endblock %}
 
-{% block body %}
+{% block title %}
+Cadastrar Motoristas
+{% endblock %}
 
-{% if messages %}
-    <div class="messages" data-dismiss="alert" style="text-align:center;">
-        {% for message in messages %}
-        {% if message.tags == 'success' %}
-        <div class="alert alert-success success" role="alert">
-            {{ message }}
+{% block form %}
+<form class="mb-3" method="POST" id="editar-dados-usuario">
+    {% csrf_token %}
+    {% for field in form %}
+    
+        {% for error in field.errors %}
+        <div class="error-messages text-danger">
+            {{ error }}
+        </div> 
+        {%endfor%}
+        <div class="form-group">
+            {{field.label_tag}}
+            {{field}}
         </div>
-        {% elif message.tags == 'warning' %}
-        <div class="alert alert-warning" role="alert">
-            {{ message }}
+    {% endfor %}
+   
+    <div class="row ">
+        <div class="col d-grid pt-3">
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
         </div>
-        {% elif message.tags == 'error' %}
-        <div class="alert alert-danger" role="alert">
-            {{ message }}
-        </div>
-        {% endif %}
-        {% endfor %}
     </div>
-{% endif %}
 
-<div class="container form-container col-sm-12 col-md-8 col-xl-6 mx-auto">
-    <form method="POST" class="col-xs-12 col-sm-8 col-md-10" id="editar-dados-usuario">
-        {% csrf_token %}
-        {% for field in form %}
-        
-            {% for error in field.errors %}
-            <div class="error-messages text-danger">
-                {{ error }}
-            </div> 
-            {%endfor%}
-            <div class="form-group">
-                {{field.label_tag}}
-                {{field}}
-            </div>
-        {% endfor %}
-       
-        <div class="row ">
-            <div class="col d-grid pt-3">
-                <button type="submit" class="btn btn-primary">Adicionar</button>
-            </div>
-        </div>
-    </form>
-</div>
-
+    
+</form>
 {% endblock %}

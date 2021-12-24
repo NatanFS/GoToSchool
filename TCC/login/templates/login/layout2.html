@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'login/css/cadastro.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/8b48b3749a.js" crossorigin="anonymous"></script>
+    
+     <!-- Box Icons CDN -->
+     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+
+    <title>
+        {% block document_title %}
+        {% endblock %}
+    </title>
+</head>
+
+<body>
+    <header class="d-flex align-items-center">
+        <a class="nav-link active" aria-current="page" href="{{request.META.HTTP_REFERER}}";>
+            <i class='bx bx-left-arrow-alt'></i>
+            <span class="links_name">Voltar</span>
+        </a>
+    </header>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="form-login col-sm-12 col-md-8 col-xl-6">
+                <div class="form-content ">
+                    <div class="titulo text-center">
+                        <h2>
+                            {% block title %}
+                            {% endblock %}
+                        </h2>
+                        <hr>
+                    </div>
+
+                    {% if messages %}
+                    <div class="messages" data-dismiss="alert" style="text-align:center;">
+                        {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                        <div class="alert alert-success success" role="alert">
+                            {{ message }}
+                        </div>
+                        {% elif message.tags == 'warning' %}
+                        <div class="alert alert-warning" role="alert">
+                            {{ message }}
+                        </div>
+                        {% elif message.tags == 'error' %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="container form-container">
+                        {% block form %}
+                        {% endblock %}
+                        <hr>
+                        <div style="padding-top: 30px;"></div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

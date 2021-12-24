@@ -2,9 +2,10 @@ from logging import PlaceHolder
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.forms import widgets
-from .models import User
 from datetime import date
 from datetime import datetime
+
+from login.models import Usuario
 CHOICES_TURNO = (("matutino", "matutino"), ("vespertino", "vespertino"), ("noturno", "noturno"))
 CHOICES_STATUS = ((-1, "Desabilitado"), (1, "Habilitado"), (0, "Aguardando resposta"))
     
@@ -18,7 +19,7 @@ class CadastrarStaffForm(UserCreationForm):
         self.fields['password2'].widget.attrs.update({ 'class':('form-control')})
         
     class Meta:
-        model = User
+        model = Usuario
         fields = ['username','first_name', 'last_name']
 
 class DadosUsuarioForm(forms.Form):
