@@ -22,7 +22,7 @@
             </div>
         {% endfor %}
         <div class="row ">
-            <div class="col d-flex justify-content-end p-3">
+            <div class="col d-grid pt-3 ">
                 <button type="submit" class="btn btn-primary">Enviar</button>
             </div>
         </div>
@@ -30,7 +30,7 @@
 
     <div class="row mx-auto">
         {% for aviso in avisos %}
-        <div class="col-12 col-lg-6">
+        <div class="col-aviso col-12 col-lg-6">
             <div class="card text-start p-0 mt-3 " id="{{aviso.idAviso}}">
                 <div class="card-header pe-lg-2">
                     <img src="{{aviso.usuario.urlFoto}}" alt="" class="foto-usuario me-2">
@@ -160,6 +160,7 @@
 
     function comentar(idAviso){
         const comentarioTexto = document.querySelector(`#comentario-input-${idAviso}`).value
+        document.querySelector(`#comentario-input-${idAviso}`).value = " "
         const res = fetch(`avisos/comentar/${idAviso}`, {method: 'POST', body: JSON.stringify({comentario: comentarioTexto})})
         loadComentarios(idAviso)
     }

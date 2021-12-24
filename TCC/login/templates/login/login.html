@@ -26,7 +26,7 @@
                     
                     <form action="{% url 'login' %}" method="POST" >
                         {% csrf_token %}
-                        <input class="form-control mt-3 mb-2" type="text" placeholder="Usuário" name="username">
+                        <input class="form-control mt-3 mb-2" type="text" placeholder="Usuário" name="email">
                         <input class="form-control mb-2" type="password" placeholder="Senha" name="password">
                         {% if message %}
                            <div class="alert-warning mt-1 mb-2 ps-2">{{ message }}</div>

@@ -59,7 +59,7 @@
                 }[b];
             }).replaceAll("'", '"').replaceAll("&#x27;", '"').replaceAll('\n', "\\n");
     console.log(novidadesString)
-    var novidadesHTML = `<div class="card-header">Lista de Avisos </div>
+    var novidadesHTML = `<div class="card-header">Lista de Novidades </div>
                             <div class="card-body">`
     const novidades = JSON.parse(novidadesString)
     novidades.forEach(novidade => {

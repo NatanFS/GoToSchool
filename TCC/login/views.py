@@ -71,6 +71,7 @@ storage = firebase.storage()
 collection = dbFirestore.collection('dados')
 doc = collection.document('requisicoesDados')
 onibusDoc = collection.document('onibus')
+usuariosDoc = collection.document('usuarios')
 
 
 auth = firebase.auth()
@@ -90,9 +91,9 @@ auth = firebase.auth()
 # Create your views here.
 def login_view(request):
     if request.method == "POST":
-        username = request.POST["username"]
+        email = request.POST["email"]
         password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
             print(user)
@@ -284,7 +285,7 @@ class CadastrarStaff(SuperuserRequiredMixin, CreateView):
     def form_valid(self, form):
         user = form.save(commit=False)
         user.set_password(form.cleaned_data["password1"])
-        user.email = form.cleaned_data["username"]
+        user.email = form.cleaned_data["email"]
         user.save()
         messages.success(self.request, "Usuário administrador adicionado com sucesso!")
         return super().form_valid(form)
@@ -377,9 +378,17 @@ def usuario_view(request, uid):
             if status == 1 and usuario["status"] == -1:
                 docUsuarios.update({"confirmados": Increment(-1)})
                 docUsuarios.update({"negados": Increment(1)})
+            if status == 1 and usuario["status"] == 0:
+                docUsuarios.update({"negados": Increment(-1)})
+                docUsuarios.update({"aguardando": Increment(1)})
             if status == -1 and usuario["status"] == 1:
+                docUsuarios.update({"negados": Increment(-1)})
                 docUsuarios.update({"confirmados": Increment(1)})
-                docUsuarios.update({"negados": Increment(-1)})       
+            if status == -1 and usuario["status"] == 0:
+                docUsuarios.update({"negados": Increment(-1)})
+                docUsuarios.update({"aguardando": Increment(1)})
+            
+                       
         
             notificacao = {}
             notificacao["status"] = 2
@@ -552,6 +561,7 @@ def motoristas_view(request):
                 "urlPDF": " ",
             }
             dbRealtime.child(f"dados/usuarios/{idMotorista}").set(motorista)
+            usuariosDoc.update({'numero': Increment(1)})
     else:
         form = MotoristaForm()
     return render(request, "login/motoristas.html" , {'title': "Cadastrar motoristas",  "form": form})

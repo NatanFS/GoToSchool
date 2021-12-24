@@ -14,6 +14,12 @@
      <!-- Box Icons CDN -->
      <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 
+   <!-- jQuery-->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+   <!-- jQuery MASK-->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+
     <title>
         {% block document_title %}
         {% endblock %}
@@ -22,7 +28,7 @@
 
 <body>
     <header class="d-flex align-items-center">
-        <a class="nav-link active" aria-current="page" href="{{request.META.HTTP_REFERER}}";>
+        <a class="nav-link active" aria-current="page" href="{% url 'index' %}";>
             <i class='bx bx-left-arrow-alt'></i>
             <span class="links_name">Voltar</span>
         </a>
@@ -72,5 +78,11 @@
         </div>
     </div>
 </body>
+
+<script>
+    $(document).ready(function(){
+        $('.mask-cpf').mask('000.000.000-00', {reverse: true});
+    });
+</script>
 
 </html>

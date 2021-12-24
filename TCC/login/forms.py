@@ -1,26 +1,28 @@
 from logging import PlaceHolder
+from cpf_field.models import CPFField
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.forms import widgets
+from django.forms import fields, widgets
 from datetime import date
 from datetime import datetime
 
-from login.models import Usuario
+from login.models import Motorista, Usuario
 CHOICES_TURNO = (("matutino", "matutino"), ("vespertino", "vespertino"), ("noturno", "noturno"))
 CHOICES_STATUS = ((-1, "Desabilitado"), (1, "Habilitado"), (0, "Aguardando resposta"))
     
 class CadastrarStaffForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({ 'class':('form-control')})
+        self.fields['email'].widget.attrs.update({ 'class':('form-control')})
         self.fields['first_name'].widget.attrs.update({ 'class':('form-control')})
         self.fields['last_name'].widget.attrs.update({ 'class':('form-control')})
+        self.fields['cpf'].widget.attrs.update({ 'class':('form-control mask-cpf')})
         self.fields['password1'].widget.attrs.update({ 'class':('form-control')})        
         self.fields['password2'].widget.attrs.update({ 'class':('form-control')})
         
     class Meta:
         model = Usuario
-        fields = ['username','first_name', 'last_name']
+        fields = ['email','first_name', 'last_name', 'cpf']
 
 class DadosUsuarioForm(forms.Form):
     nome = forms.CharField(max_length=100, label="Nome do passageiro")
@@ -38,14 +40,14 @@ class DadosUsuarioForm(forms.Form):
         self.fields['turno'].widget.attrs.update({ 'class':('form-select')})        
         self.fields['status'].widget.attrs.update({'class':('form-select')})
 
-class MotoristaForm(forms.Form):
-    nome = forms.CharField(max_length=100, label="Nome do motorista")
-    email = forms.CharField(max_length=100, label="E-mail")
-    cpf = forms.CharField(max_length=14, min_length=14, label="CPF")
-    turno = forms.ChoiceField(choices=CHOICES_TURNO, label="Turno")
+class MotoristaForm(forms.ModelForm):
     senha1 = forms.CharField(widget=forms.PasswordInput)
     senha2 = forms.CharField(widget=forms.PasswordInput)
     
+    class Meta:
+        model = Motorista
+        fields = '__all__'
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['nome'].widget.attrs.update({'class':('form-control')})
@@ -53,9 +55,10 @@ class MotoristaForm(forms.Form):
         self.fields['senha2'].widget.attrs.update({'class':('form-control')})
         self.fields['senha1'].label = "Senha:"
         self.fields['senha2'].label = "Confirmar senha:"
+        self.fields['cpf'].widget.attrs.update({ 'class':('form-control mask-cpf')})
         self.fields['email'].widget.attrs.update({ 'class':('form-control'), })
         self.fields['turno'].widget.attrs.update({ 'class':('form-select')}) 
-        self.fields['cpf'].widget.attrs.update({ 'class':('form-control mask-cpf'), })  
+        
 
 class NovidadeForm(forms.Form):
     titulo = forms.CharField(max_length=100, label="Título")

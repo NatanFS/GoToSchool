@@ -4,6 +4,9 @@ from django.contrib.auth.models import AbstractUser
 from cpf_field.models import CPFField
 
 # Create your models here.
+
+CHOICES_TURNO = (("matutino", "matutino"), ("vespertino", "vespertino"), ("noturno", "noturno"))
+
 class UsuarioManager(BaseUserManager):
     use_in_migrations = True
 
@@ -38,17 +41,8 @@ class Usuario(AbstractUser):
     last_name = models.CharField(verbose_name=('Sobrenome'), max_length=100, blank=False,
                                  help_text=('Sobrenome é obrigatorio'))
     email = models.EmailField('E-mail', unique=True)
-
-    estado_civil = models.CharField(verbose_name='Estado Civil', max_length=25, null=False, default='Indefinido')
-    profissao = models.CharField(verbose_name='Profissão', max_length=50, null=True, default='')
-    genero = models.CharField(verbose_name='Gênero', max_length=25, null=True, default='')
-    nacionalidade = models.CharField(verbose_name='Nacionalidade', max_length=50, null=True, default='Brasileira')
-    cpf = CPFField('cpf', default='000.000.000-00')
-    # telefone
-    endereco = models.CharField(verbose_name='Endereço', max_length=200, null=True, default='')
-
+    cpf = CPFField('CPF', default='000.000.000-00')
     is_staff = models.BooleanField("Membro da equipe", default=False)
-    is_confirmed = models.BooleanField("Usuário confirmado", default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
   
@@ -56,3 +50,9 @@ class Usuario(AbstractUser):
         return self.email
 
     objects = UsuarioManager()
+    
+class Motorista(models.Model):
+    nome = models.CharField(max_length=100, verbose_name="Nome do motorista")
+    email = models.CharField(max_length=100, verbose_name="E-mail")
+    cpf = CPFField('CPF', default='000.000.000-00')
+    turno = models.CharField(choices=CHOICES_TURNO, verbose_name="Turno", max_length=30)
